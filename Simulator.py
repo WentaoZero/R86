@@ -52,16 +52,16 @@ def p_source_register(p):
         p[0] = 0
 
 def p_source_memory_general(p):
-	"source : LPAREN memory RPAREN"
-	p[0] = p[2]
+	"source : memory"
+	p[0] = p[1]
 
 def p_source_number(p):
     "source : DOLLAR NUMBER"
     p[0] = p[2]
 
 def p_memory_register(p):
-	"memory : REGISITER"
-	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[1][1:]))
+	"memory : LPAREN REGISITER RPAREN"
+	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2][1:]))
 
 def p_expression_source(p):
 	"statement : source"
