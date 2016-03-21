@@ -1,7 +1,11 @@
 class Storage:
 	def __init__(self, vCapacity):
 		self.Name = "MEMORY"
-		self.Content = [-1] * vCapacity
+		self.Content = [0] * vCapacity
+
+		for num in range(0,5):
+			self.Content[num] = -num
+
 		#self.Content = [[0] * vWordLength] * vCapacity
 
 	def set(self, vVal, vAddress):
