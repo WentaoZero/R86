@@ -51,7 +51,7 @@ def p_source_register(p):
         print("Unknown register '%s'" % p[2])
         p[0] = 0
 
-def p_source_memory_general(p):
+def p_source_memory_direct(p):
 	"source : memory"
 	p[0] = p[1]
 
@@ -59,9 +59,25 @@ def p_source_number(p):
     "source : DOLLAR NUMBER"
     p[0] = p[2]
 
+def p_memory_number(p):
+	"memory : NUMBER"
+	p[0] = R86Processor.getMemory(p[1])
+
 def p_memory_register(p):
 	"memory : LPAREN REGISITER RPAREN"
 	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2][1:]))
+
+def p_memory_number_and_register(p):
+	"memory : NUMBER LPAREN REGISITER RPAREN"
+	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3][1:]))
+
+def p_memory_double_register(p):
+	"memory : LPAREN REGISITER COMMA REGISITER RPAREN"
+	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2][1:]) + R86Processor.getRegValue(p[4][1:]))
+
+def p_memory_number_double_register(p):
+	"memory : NUMBER LPAREN REGISITER COMMA REGISITER RPAREN"
+	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3][1:]) + R86Processor.getRegValue(p[5][1:]))
 
 def p_expression_source(p):
 	"statement : source"
@@ -74,9 +90,15 @@ yacc.yacc(debug=0, write_tables=0)
 
 #yacc.parse("mov $0, %eax")
 
-yacc.parse("mov $fff, %ecx")
-yacc.parse("mov $123, %edx")
-yacc.parse("mov (%eax), %ebx")
+#yacc.parse("mov $fff, %ecx")
+#yacc.parse("mov $123, %edx")
+#yacc.parse("mov 1(%eax), %edx")
+#yacc.parse("mov 3(%eax), %ebx")
+
+yacc.parse("mov $1, %eax")
+yacc.parse("mov $2, %ecx")
+yacc.parse("mov 1(%eax, %ecx), %esi")
+yacc.parse("mov 2, %esi")
 
 R86Processor.printReg()
 R86Processor.printMemory()

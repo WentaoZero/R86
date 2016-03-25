@@ -5,6 +5,19 @@
 	popl %ebp
 
 
+	Immediate $Imm          Imm                        Immediate
+	Register  Ea            R[Ea]                      Register
+	Memory    Imm           M[Imm]                     Absolute
+	Memory    (Ea)          M[R[Ea]]                   Indirect
+	Memory    Imm(Eb)       M[Imm + R[Eb]]             Base + displacement
+	Memory    (Eb,Ei)       M[R[Eb]+ R[Ei]]            Indexed
+Memory    Imm(Eb,Ei)    M[Imm + R[Eb]+ R[Ei]]      Indexed
+Memory    (,Ei,s)       M[R[Ei] . s]               Scaled indexed
+Memory    Imm(,Ei,s)    M[Imm + R[Ei] . s]         Scaled indexed
+Memory    (Eb,Ei,s)     M[R[Eb]+ R[Ei] . s]        Scaled indexed
+Memory    Imm(Eb,Ei,s)  M[Imm + R[Eb]+ R[Ei] . s]  Scaled indexed
+
+
 		  S, D
 	mov:
 		movb movw movz
