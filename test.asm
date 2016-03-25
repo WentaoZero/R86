@@ -4,6 +4,17 @@
 	addl 8(%ebp), %eax
 	popl %ebp
 
+sum:
+pushl %ebp
+movl %esp, %ebp
+movl 12(%ebp), %eax
+addl 8(%ebp), %eax
+popl %ebp
+ret
+
+;do push
+;do pop
+
 
 	Immediate $Imm          Imm                        Immediate
 	Register  Ea            R[Ea]                      Register

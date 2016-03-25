@@ -12,7 +12,7 @@ class R86:
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)
 		self.RegisterTable.update(self.SpecialReg.RegisterTable)
 
-	def setRegValue(self, vReg, vValue):
+	def setRegValue(self, vValue, vReg):
 	    try:
 	        self.RegisterTable[vReg].setValue(vValue)
 	    except LookupError:

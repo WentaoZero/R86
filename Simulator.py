@@ -1,18 +1,23 @@
 tokens = (
 	"REGISITER",
 	"DOLLAR",
-	"NUMBER",
-    "INSTRUCTION",
+    "MOVINS",
+	"ADDINS",
     "COMMA",
     "LPAREN",
-    "RPAREN"
+    "RPAREN",
+    "NUMBER"
     )
 
+t_MOVINS = r"movl"
 t_DOLLAR = r"\$"
-t_INSTRUCTION   = r"mov"
-t_COMMA = r","
+t_COMMA  = r","
 t_LPAREN = r"\("
 t_RPAREN = r"\)"
+
+def t_ADDINS(token):
+	r"addl"
+	return token
 
 def t_NUMBER(t):
     r"-?[0-9a-fA-F]+"
@@ -40,8 +45,12 @@ from R86 import R86
 R86Processor = R86()
 
 def p_statement_move(p):
-    "statement : INSTRUCTION source COMMA REGISITER"
-    R86Processor.setRegValue(p[4][1:], p[2])
+    "statement : MOVINS source COMMA REGISITER"
+    R86Processor.setRegValue(p[2], p[4][1:])
+
+def p_statement_add(p):
+	"statement : ADDINS source COMMA REGISITER"
+	R86Processor.setRegValue(p[2] + R86Processor.getRegValue(p[4][1:]), p[4][1:])
 
 def p_source_register(p):
     "source : REGISITER"
@@ -61,7 +70,8 @@ def p_source_number(p):
 
 def p_memory_number(p):
 	"memory : NUMBER"
-	p[0] = R86Processor.getMemory(p[1])
+	p[0] = 0
+	#p[0] = R86Processor.getMemory(p[1])
 
 def p_memory_register(p):
 	"memory : LPAREN REGISITER RPAREN"
@@ -88,31 +98,25 @@ def p_error(p):
 import ply.yacc as yacc
 yacc.yacc(debug=0, write_tables=0)
 
-#yacc.parse("mov $0, %eax")
 
-#yacc.parse("mov $fff, %ecx")
-#yacc.parse("mov $123, %edx")
-#yacc.parse("mov 1(%eax), %edx")
-#yacc.parse("mov 3(%eax), %ebx")
+for i in range(0,10):
+	R86Processor.setMemory(i*i, i)
 
-yacc.parse("mov $1, %eax")
-yacc.parse("mov $2, %ecx")
-yacc.parse("mov 1(%eax, %ecx), %esi")
-yacc.parse("mov 2, %esi")
+yacc.parse("movl $1, %eax")
+yacc.parse("movl $2, %ecx")
+yacc.parse("movl 1(%eax, %ecx), %esi")
+yacc.parse("movl 2, %esi")
+
+yacc.parse("addl 8(%ebp), %eax")
+
+#yacc.parse("addl 3 %eax")
+
 
 R86Processor.printReg()
-R86Processor.printMemory()
-
-#print(hex(234))
-
-#yacc.parse("$f")
-
-#R86Processor.printReg()
+#R86Processor.printMemory()
 
 print("")
 
-#print(int("afff",16))
 
-#R86Processor.printReg()
-#R86Processor.printMemory()
+
 

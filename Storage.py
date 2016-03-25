@@ -1,11 +1,13 @@
 class Storage:
 	def __init__(self, vCapacity):
 		self.Name = "MEMORY"
-		self.Content = [0] * vCapacity
+		self.Content = {}
+		'''
+		[0] * vCapacity
 
 		for num in range(0,5):
 			self.Content[num] = -num
-
+		'''
 		#self.Content = [[0] * vWordLength] * vCapacity
 
 	def set(self, vVal, vAddress):
@@ -16,8 +18,12 @@ class Storage:
 
 	def printSelf(self):
 		print(self.Name)
+		print(self.Content)
+
+		'''
 		count = 0
 		for item in self.Content:
 			print(str(count) + " " + str(item))
 			count += 1
 		print("")
+		'''
