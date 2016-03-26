@@ -94,7 +94,7 @@ def p_source_register(p):
         p[0] = 0
 
 def p_source_memory_direct(p):
-	"source : memory"
+	"source : memory_as_source"
 	p[0] = p[1]
 
 def p_source_number(p):
@@ -111,23 +111,23 @@ def p_number(p):
 	p[0] = p[1]
 
 def p_memory_number(p):
-	"memory : NUMBER"
+	"memory_as_source : NUMBER"
 	p[0] = R86Processor.getMemory(p[1])
 
 def p_memory_register(p):
-	"memory : LPAREN register RPAREN"
-	p[0] = R86Processor.getMemory(p[2])
+	"memory_as_source : LPAREN register RPAREN"
+	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2]))
 
 def p_memory_number_and_register(p):
-	"memory : NUMBER LPAREN register RPAREN"
+	"memory_as_source : NUMBER LPAREN register RPAREN"
 	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]))
 
 def p_memory_double_register(p):
-	"memory : LPAREN register COMMA register RPAREN"
+	"memory_as_source : LPAREN register COMMA register RPAREN"
 	p[0] = R86Processor.getMemory(p[2] + p[4])
 
 def p_memory_number_double_register(p):
-	"memory : NUMBER LPAREN register COMMA register RPAREN"
+	"memory_as_source : NUMBER LPAREN register COMMA register RPAREN"
 	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]) + R86Processor.getRegValue(p[5]))
 
 def p_register(p):
@@ -146,41 +146,35 @@ import ply.yacc as yacc
 yacc.yacc(debug=0, write_tables=0)
 
 
-for i in range(0,20):
+for i in range(0,500):
 	R86Processor.setMemory(i*i, i*4)
 
-#yacc.parse("0xa")
-
-#yacc.parse("movl $0xf, %eax")
-#yacc.parse("movl $2, %ecx")
-#yacc.parse("movl 1(%eax, %ecx), %esi")
-#yacc.parse("movl 0x5, %esi")
-
 #R86Processor.printReg()
-#print()
 
-yacc.parse("movl $0xf, %eax")
-
-#yacc.parse("addl 8(%ecx), %eax")
-
-yacc.parse("movl $-4, %ebp")
-
+yacc.parse("movl $20, %ebp")
 yacc.parse("movl $20, %esp")
+yacc.parse("pushl %ebp")
+yacc.parse("movl %esp, %ebp")
+yacc.parse("movl 8(%ebp), %edx")
+yacc.parse("movl 12(%ebp), %eax")
+yacc.parse("addl (%edx), %eax")
 
-#R86Processor.printReg()
-print()
-
-yacc.parse("pushl $-6")
-
-#R86Processor.printReg()
-R86Processor.printMemory()
-
-yacc.parse("popl %ebp")
-#R86Processor.setRegValue(299, "eax")
 R86Processor.printReg()
 
 
+#print(R86Processor.getRegValue("ebp"))
+
+#print(R86Processor.getRegValue("edx"))
+
+
+
+#print(R86Processor.getMemory(R86Processor.getRegValue("edx")))
+
+'''
+yacc.parse("addl (%edx), %eax")
+yacc.parse("movl %eax, (%edx)")
+yacc.parse("popl %ebp")
+
+'''
+#R86Processor.printReg()
 #R86Processor.printMemory()
-
-print("")
-
