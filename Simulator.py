@@ -6,22 +6,31 @@ tokens = (
     "COMMA",
     "LPAREN",
     "RPAREN",
-    "NUMBER"
+    "DECNUM",
+    "HEXNUM"
     )
 
-t_MOVINS = r"movl"
 t_DOLLAR = r"\$"
 t_COMMA  = r","
 t_LPAREN = r"\("
 t_RPAREN = r"\)"
 
-def t_ADDINS(token):
-	r"addl"
-	return token
+def t_MOVINS(t):
+	r"movl"
+	return t
 
-def t_NUMBER(t):
-    r"-?[0-9a-fA-F]+"
+def t_ADDINS(t):
+	r"addl"
+	return t
+
+def t_HEXNUM(t):
+    r"-?0x[0-9a-fA-F]+"
     t.value = int(t.value, 16)
+    return t
+
+def t_DECNUM(t):
+    r"-?[0-9]+"
+    t.value = int(t.value, 10)
     return t
 
 t_REGISITER  = r"\%(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
@@ -68,10 +77,14 @@ def p_source_number(p):
     "source : DOLLAR NUMBER"
     p[0] = p[2]
 
+def p_number(p):
+	"""NUMBER : DECNUM
+			  | HEXNUM"""
+	p[0] = p[1]
+
 def p_memory_number(p):
 	"memory : NUMBER"
-	p[0] = 0
-	#p[0] = R86Processor.getMemory(p[1])
+	p[0] = R86Processor.getMemory(p[1])
 
 def p_memory_register(p):
 	"memory : LPAREN REGISITER RPAREN"
@@ -94,6 +107,8 @@ def p_expression_source(p):
 
 def p_error(p):
     print("Syntax error at '%s'" % p.value)
+    print("sth wrong with: ")
+    print(p)
 
 import ply.yacc as yacc
 yacc.yacc(debug=0, write_tables=0)
@@ -102,21 +117,16 @@ yacc.yacc(debug=0, write_tables=0)
 for i in range(0,10):
 	R86Processor.setMemory(i*i, i)
 
-yacc.parse("movl $1, %eax")
-yacc.parse("movl $2, %ecx")
-yacc.parse("movl 1(%eax, %ecx), %esi")
-yacc.parse("movl 2, %esi")
+yacc.parse("movl $0xa, %eax")
+#yacc.parse("movl $2, %ecx")
+#yacc.parse("movl 1(%eax, %ecx), %esi")
+yacc.parse("movl 0x2, %esi")
 
 yacc.parse("addl 8(%ebp), %eax")
 
-#yacc.parse("addl 3 %eax")
-
 
 R86Processor.printReg()
-#R86Processor.printMemory()
+R86Processor.printMemory()
 
 print("")
-
-
-
 
