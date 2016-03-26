@@ -3,6 +3,8 @@ tokens = (
 	"DOLLAR",
     "MOVINS",
 	"ADDINS",
+	"PUSHINS",
+	"POPINS",
     "COMMA",
     "PERCENTAGE",
     "LPAREN",
@@ -27,6 +29,14 @@ def t_MOVINS(t):
 
 def t_ADDINS(t):
 	r"addl"
+	return t
+
+def t_PUSHINS(t):
+	r"pushl"
+	return t
+
+def t_POPINS(t):
+	r"popl"
 	return t
 
 def t_HEXNUM(t):
@@ -58,19 +68,29 @@ from R86 import R86
 R86Processor = R86()
 
 def p_statement_move(p):
-    "statement : MOVINS source COMMA register"
+    "statement : MOVINS source COMMA destination"
     R86Processor.setRegValue(p[2], p[4])
 
 def p_statement_add(p):
-	"statement : ADDINS source COMMA register"
+	"statement : ADDINS source COMMA destination"
 	R86Processor.setRegValue(p[2] + R86Processor.getRegValue(p[4]), p[4])
+
+def p_statement_push(p):
+	"statement : PUSHINS source"
+	R86Processor.setRegValue(R86Processor.getRegValue("esp")-4, "esp")
+	R86Processor.setMemory(p[2], R86Processor.getRegValue("esp"))
+
+def p_statement_pop(p):
+	"statement : POPINS destination"
+	R86Processor.setRegValue(R86Processor.getMemory(R86Processor.getRegValue("esp")), p[2])
+	R86Processor.setRegValue(R86Processor.getRegValue("esp")+4, "esp")
 
 def p_source_register(p):
     "source : register"
     try:
-        p[0] = p[1]
+        p[0] = R86Processor.getRegValue(p[1])
     except LookupError:
-        print("Unknown register '%s'" % p[2])
+        print("Unknown register '%s'" % p[1])
         p[0] = 0
 
 def p_source_memory_direct(p):
@@ -80,6 +100,10 @@ def p_source_memory_direct(p):
 def p_source_number(p):
     "source : DOLLAR NUMBER"
     p[0] = p[2]
+
+def p_destination_register(p):
+	"destination : register"
+	p[0] = p[1]
 
 def p_number(p):
 	"""NUMBER : DECNUM
@@ -132,15 +156,31 @@ for i in range(0,20):
 #yacc.parse("movl 1(%eax, %ecx), %esi")
 #yacc.parse("movl 0x5, %esi")
 
+#R86Processor.printReg()
+#print()
+
 yacc.parse("movl $0xf, %eax")
 
-yacc.parse("addl 8(%ecx), %eax")
+#yacc.parse("addl 8(%ecx), %eax")
 
-#R86Processor.setRegValue(299, "eax")
+yacc.parse("movl $-4, %ebp")
 
+yacc.parse("movl $20, %esp")
 
-R86Processor.printReg()
+#R86Processor.printReg()
+print()
+
+yacc.parse("pushl $-6")
+
+#R86Processor.printReg()
 R86Processor.printMemory()
+
+yacc.parse("popl %ebp")
+#R86Processor.setRegValue(299, "eax")
+R86Processor.printReg()
+
+
+#R86Processor.printMemory()
 
 print("")
 
