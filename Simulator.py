@@ -67,12 +67,17 @@ lex.lex()
 from R86 import R86
 R86Processor = R86()
 
-def p_statement_move(p):
-    "statement : MOVINS source COMMA destination"
+def p_statement_move_to_register(p):
+    "statement : MOVINS source COMMA register"
     R86Processor.setRegValue(p[2], p[4])
 
+def p_statement_move_to_memory(p):
+    "statement : MOVINS source COMMA LPAREN register RPAREN"
+    R86Processor.setMemory(p[2], R86Processor.getRegValue(p[5]))
+    #R86Processor.setRegValue(p[2], p[4])
+
 def p_statement_add(p):
-	"statement : ADDINS source COMMA destination"
+	"statement : ADDINS source COMMA register"
 	R86Processor.setRegValue(p[2] + R86Processor.getRegValue(p[4]), p[4])
 
 def p_statement_push(p):
@@ -81,9 +86,14 @@ def p_statement_push(p):
 	R86Processor.setMemory(p[2], R86Processor.getRegValue("esp"))
 
 def p_statement_pop(p):
-	"statement : POPINS destination"
+	"statement : POPINS register"
 	R86Processor.setRegValue(R86Processor.getMemory(R86Processor.getRegValue("esp")), p[2])
 	R86Processor.setRegValue(R86Processor.getRegValue("esp")+4, "esp")
+
+def p_number(p):
+	"""NUMBER : DECNUM
+			  | HEXNUM"""
+	p[0] = p[1]
 
 def p_source_register(p):
     "source : register"
@@ -101,32 +111,23 @@ def p_source_number(p):
     "source : DOLLAR NUMBER"
     p[0] = p[2]
 
-def p_destination_register(p):
-	"destination : register"
-	p[0] = p[1]
-
-def p_number(p):
-	"""NUMBER : DECNUM
-			  | HEXNUM"""
-	p[0] = p[1]
-
-def p_memory_number(p):
+def p_memory_as_source_number(p):
 	"memory_as_source : NUMBER"
 	p[0] = R86Processor.getMemory(p[1])
 
-def p_memory_register(p):
+def p_memory_as_source_register(p):
 	"memory_as_source : LPAREN register RPAREN"
 	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2]))
 
-def p_memory_number_and_register(p):
+def p_memory_as_source_number_and_register(p):
 	"memory_as_source : NUMBER LPAREN register RPAREN"
 	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]))
 
-def p_memory_double_register(p):
+def p_memory_as_source_double_register(p):
 	"memory_as_source : LPAREN register COMMA register RPAREN"
 	p[0] = R86Processor.getMemory(p[2] + p[4])
 
-def p_memory_number_double_register(p):
+def p_memory_as_source_number_double_register(p):
 	"memory_as_source : NUMBER LPAREN register COMMA register RPAREN"
 	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]) + R86Processor.getRegValue(p[5]))
 
@@ -146,7 +147,7 @@ import ply.yacc as yacc
 yacc.yacc(debug=0, write_tables=0)
 
 
-for i in range(0,500):
+for i in range(0,30):
 	R86Processor.setMemory(i*i, i*4)
 
 #R86Processor.printReg()
@@ -159,8 +160,16 @@ yacc.parse("movl 8(%ebp), %edx")
 yacc.parse("movl 12(%ebp), %eax")
 yacc.parse("addl (%edx), %eax")
 
-R86Processor.printReg()
 
+yacc.parse("movl $19, %eax")
+yacc.parse("movl $4, %edx")
+yacc.parse("movl %eax, (%edx)")
+
+#yacc.parse("movl %eax, %edx")
+
+
+R86Processor.printReg()
+R86Processor.printMemory()
 
 #print(R86Processor.getRegValue("ebp"))
 
