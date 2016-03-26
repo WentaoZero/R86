@@ -1,19 +1,25 @@
 tokens = (
-	"REGISITER",
+	"REGNAME",
 	"DOLLAR",
     "MOVINS",
 	"ADDINS",
     "COMMA",
+    "PERCENTAGE",
     "LPAREN",
     "RPAREN",
     "DECNUM",
     "HEXNUM"
     )
 
-t_DOLLAR = r"\$"
+t_DOLLAR     = r"\$"
+t_PERCENTAGE = r"\%"
 t_COMMA  = r","
 t_LPAREN = r"\("
 t_RPAREN = r"\)"
+
+def t_REGNAME(t):
+	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
+	return t
 
 def t_MOVINS(t):
 	r"movl"
@@ -32,8 +38,6 @@ def t_DECNUM(t):
     r"-?[0-9]+"
     t.value = int(t.value, 10)
     return t
-
-t_REGISITER  = r"\%(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
 
 # Ignored characters
 t_ignore = " \t"
@@ -54,17 +58,17 @@ from R86 import R86
 R86Processor = R86()
 
 def p_statement_move(p):
-    "statement : MOVINS source COMMA REGISITER"
-    R86Processor.setRegValue(p[2], p[4][1:])
+    "statement : MOVINS source COMMA register"
+    R86Processor.setRegValue(p[2], p[4])
 
 def p_statement_add(p):
-	"statement : ADDINS source COMMA REGISITER"
-	R86Processor.setRegValue(p[2] + R86Processor.getRegValue(p[4][1:]), p[4][1:])
+	"statement : ADDINS source COMMA register"
+	R86Processor.setRegValue(p[2] + R86Processor.getRegValue(p[4]), p[4])
 
 def p_source_register(p):
-    "source : REGISITER"
+    "source : register"
     try:
-        p[0] = int(R86Processor.getRegValue(p[1][1:]))
+        p[0] = p[1]
     except LookupError:
         print("Unknown register '%s'" % p[2])
         p[0] = 0
@@ -87,20 +91,24 @@ def p_memory_number(p):
 	p[0] = R86Processor.getMemory(p[1])
 
 def p_memory_register(p):
-	"memory : LPAREN REGISITER RPAREN"
-	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2][1:]))
+	"memory : LPAREN register RPAREN"
+	p[0] = R86Processor.getMemory(p[2])
 
 def p_memory_number_and_register(p):
-	"memory : NUMBER LPAREN REGISITER RPAREN"
-	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3][1:]))
+	"memory : NUMBER LPAREN register RPAREN"
+	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]))
 
 def p_memory_double_register(p):
-	"memory : LPAREN REGISITER COMMA REGISITER RPAREN"
-	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2][1:]) + R86Processor.getRegValue(p[4][1:]))
+	"memory : LPAREN register COMMA register RPAREN"
+	p[0] = R86Processor.getMemory(p[2] + p[4])
 
 def p_memory_number_double_register(p):
-	"memory : NUMBER LPAREN REGISITER COMMA REGISITER RPAREN"
-	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3][1:]) + R86Processor.getRegValue(p[5][1:]))
+	"memory : NUMBER LPAREN register COMMA register RPAREN"
+	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]) + R86Processor.getRegValue(p[5]))
+
+def p_register(p):
+	"register : PERCENTAGE REGNAME"
+	p[0] = p[2]
 
 def p_expression_source(p):
 	"statement : source"
@@ -114,15 +122,21 @@ import ply.yacc as yacc
 yacc.yacc(debug=0, write_tables=0)
 
 
-for i in range(0,10):
-	R86Processor.setMemory(i*i, i)
+for i in range(0,20):
+	R86Processor.setMemory(i*i, i*4)
 
-yacc.parse("movl $0xa, %eax")
+#yacc.parse("0xa")
+
+#yacc.parse("movl $0xf, %eax")
 #yacc.parse("movl $2, %ecx")
 #yacc.parse("movl 1(%eax, %ecx), %esi")
-yacc.parse("movl 0x2, %esi")
+#yacc.parse("movl 0x5, %esi")
 
-yacc.parse("addl 8(%ebp), %eax")
+yacc.parse("movl $0xf, %eax")
+
+yacc.parse("addl 8(%ecx), %eax")
+
+#R86Processor.setRegValue(299, "eax")
 
 
 R86Processor.printReg()
