@@ -6,7 +6,7 @@ class Simulator:
 		for i in range(0, 10):
 			R86Processor.setMemory(0, i*4)
 	def readFile(self):
-		with open("test.asm") as InputFile:
+		with open("Simple.asm") as InputFile:
 			for line in InputFile:
 				CleanLine = line.strip("\n\t")
 				if (0 != len(CleanLine) and CleanLine[0] != ";"):
