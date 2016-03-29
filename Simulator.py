@@ -4,9 +4,9 @@ import argparse
 
 
 class Simulator:
-	def setMemory(self):
-		for i in range(0, 10):
-			R86Processor.setMemory(0, i*4)
+	def initMemory(self, vMin, vMax):
+		R86Processor.initMemory(vMin, vMax)
+
 	def readFile(self, vFileName):
 		with open(vFileName) as InputFile:
 			for line in InputFile:
@@ -24,10 +24,12 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("AsmFile", type=str, help="Assembly File")
+	parser.add_argument("min", type=int, help="Memory allocate from")
+	parser.add_argument("max", type=int, help="Memory allocate to")
 	args = parser.parse_args()
 
 	MySim = Simulator()
-	MySim.setMemory()
+	MySim.initMemory(args.min, args.max)
 
 	MySim.readFile(args.AsmFile)
 	R86Processor.printSelf()

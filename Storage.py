@@ -2,8 +2,12 @@ class Storage:
 	def __init__(self, vCapacity):
 		self.Name = "MEMORY"
 		self.Content = {}
-		self.AddressMin = 0
-		self.AddressMax = 0
+
+	def init(self, vMin, vMax):
+		self.AddressMin = vMin
+		self.AddressMax = vMax
+		for i in range(int(vMin/4), int(vMax/4)+1):
+			self.Content[i*4] = 0
 
 	def set(self, vVal, vAddress):
 		self.Content[vAddress] = vVal
@@ -15,7 +19,5 @@ class Storage:
 
 	def printSelf(self):
 		print(self.Name)
-
-		for i in range(int(self.AddressMin/4), int(self.AddressMax/4)+1):
-			oppose = int(self.AddressMax/4) - i
-			print("[" + str(oppose*4) + "]: " + str(self.Content[oppose*4]))
+		for i in reversed(range(int(self.AddressMin/4), int(self.AddressMax/4)+1)):
+			print("[" + str(i*4) + "]: " + str(self.Content[i*4]))

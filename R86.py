@@ -24,6 +24,9 @@ class R86:
 	    except LookupError:
 	    	print("***\nRegister not found: [" + vReg + "]\n***")
 
+	def initMemory(self, vMin, vMax):
+		self.Memory.init(vMin, vMax)
+
 	def setMemory(self, vValue, vAddress):
 		self.Memory.set(vValue, vAddress)
 
