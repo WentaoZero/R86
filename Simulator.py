@@ -23,14 +23,14 @@ class Simulator:
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("AsmFile", type=str, help="Assembly File")
-	parser.add_argument("min", type=int, help="Memory allocate from")
-	parser.add_argument("max", type=int, help="Memory allocate to")
+	parser.add_argument("asm", type=str, help="Assembly file")
+	parser.add_argument("begin", type=int, help="Memory allocated from")
+	parser.add_argument("end", type=int, help="Memory allocated to")
 	args = parser.parse_args()
 
 	MySim = Simulator()
-	MySim.initMemory(args.min, args.max)
+	MySim.initMemory(args.begin, args.end)
 
-	MySim.readFile(args.AsmFile)
+	MySim.readFile(args.asm)
 	R86Processor.printSelf()
 
