@@ -6,7 +6,8 @@ class Storage:
 	def init(self, vMin, vMax):
 		self.AddressMin = vMin
 		self.AddressMax = vMax
-		for i in range(int(vMin/4), int(vMax/4)+1):
+
+		for i in range(int(self.AddressMin/4), int(self.AddressMax/4)+1):
 			self.Content[i*4] = 0
 
 	def set(self, vVal, vAddress):
