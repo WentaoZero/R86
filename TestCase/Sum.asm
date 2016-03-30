@@ -7,9 +7,11 @@
 	movl $23, 8(%ebp)
 	;set y to 23
 
-;body
+;Sum:
 	pushl %ebp
 	movl %esp, %ebp
+
 	movl 0xc(%ebp), %eax
 	addl 0x8(%ebp), %eax
+
 	popl %ebp

@@ -2,23 +2,23 @@
 	movl $16, %ebp
 	movl %ebp, %esp
 	;set %ebp, %esp to 16
-	movl $36, %eax
-	;set xp to 36
-	movl $-3, (%eax)
+	movl $20, %eax
+	;set xp to 20
+	movl $9, (%eax)
 	movl %eax, 4(%ebp)
-	;set *xp to -3
+	;set *xp to 9
 	movl %ebp, (%ebp)
 	;store %ebp
-	movl $20, 8(%ebp)
-	;set y to 20
+	movl $8, 8(%ebp)
+	;set y to 8
 
-;Simple:
+;Exchange:
 	pushl %ebp
 	movl %esp, %ebp
 
 	movl 8(%ebp), %edx
-	movl 12(%ebp), %eax
-	addl (%edx), %eax
-	movl %eax, (%edx)
+	movl (%edx), %eax
+	movl 12(%ebp), %ecx
+	movl %ecx, (%edx)
 
 	popl %ebp
