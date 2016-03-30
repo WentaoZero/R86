@@ -12,7 +12,7 @@
 	movl $20, 8(%ebp)
 	;set y to 20
 
-;Body
+;body
 	pushl %ebp
 	movl %esp, %ebp
 	movl 8(%ebp), %edx
