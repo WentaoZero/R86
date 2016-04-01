@@ -74,7 +74,6 @@ def p_statement_move_to_register(p):
 def p_statement_move_to_memory_register(p):
     "statement : MOVINS source COMMA LPAREN register RPAREN"
     R86Processor.setMemory(p[2], R86Processor.getRegValue(p[5]))
-    #R86Processor.setRegValue(p[2], p[4])
 
 def p_statement_move_to_memory_number_register(p):
     "statement : MOVINS source COMMA NUMBER LPAREN register RPAREN"
