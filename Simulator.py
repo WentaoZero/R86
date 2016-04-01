@@ -22,6 +22,17 @@ class Simulator:
 
 if __name__ == '__main__':
 
+	'''
+	from R86 import R86
+	R86Pro = R86()
+
+	print(R86Pro.arithDict["addl"](3,9))
+
+	#print(temp)
+
+	exit()
+	'''
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument("asm", type=str, help="Assembly file")
 	parser.add_argument("begin", type=int, help="Memory allocated from")

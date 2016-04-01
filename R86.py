@@ -7,6 +7,10 @@ class R86:
 		self.IntegerReg = IntegerRegister()
 		self.SpecialReg = SpecialRegister()
 		self.Memory = Storage(5)
+		self.arithDict = {}
+		self.arithDict["addl"] = lambda x, y: x + y
+		self.arithDict["subl"] = lambda x, y: x - y
+		self.arithDict["xorl"] = lambda x, y: x ^ y
 
 		self.RegisterTable = self.SegmentReg.RegisterTable.copy()
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)
@@ -32,6 +36,9 @@ class R86:
 
 	def getMemory(self, vAddress):
 		return self.Memory.get(vAddress)
+
+	def arithOperate(self, vIns, vSource, vReg):
+		self.setRegValue(self.arithDict[vIns](self.getRegValue(vReg), vSource), vReg)
 
 	def printReg(self):
 		self.SegmentReg.printSelf()

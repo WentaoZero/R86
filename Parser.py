@@ -105,7 +105,10 @@ def p_statement_move_to_memory_number(p):
 
 def p_statement_add(p):
 	"statement : ADDINS source COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[4]) + p[2], p[4])
+	R86Processor.arithOperate(p[1], p[2], p[4])
+	#arithOperate(self, vIns, vSource, vReg):
+	#arithOperate
+	#R86Processor.setRegValue(R86Processor.getRegValue(p[4]) + p[2], p[4])
 
 def p_statement_sub(p):
 	"statement : SUBINS source COMMA register"
