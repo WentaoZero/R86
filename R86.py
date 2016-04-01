@@ -7,10 +7,12 @@ class R86:
 		self.IntegerReg = IntegerRegister()
 		self.SpecialReg = SpecialRegister()
 		self.Memory = Storage(5)
+
 		self.arithDict = {}
 		self.arithDict["addl"] = lambda x, y: x + y
 		self.arithDict["subl"] = lambda x, y: x - y
 		self.arithDict["xorl"] = lambda x, y: x ^ y
+		self.arithDict["sarl"] = lambda x, y: x >> y
 
 		self.RegisterTable = self.SegmentReg.RegisterTable.copy()
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)

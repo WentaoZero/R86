@@ -1,14 +1,11 @@
 tokens = (
 	"REGNAME",
 	"DOLLAR",
-    "MOVINS",
-	"ADDINS",
-	"SUBINS",
-	"PUSHINS",
-	"POPINS",
-	"XORINS",
-	"SARINS",
-	"NOTINS",
+    "MOV",
+    "ARITH",
+	"PUSH",
+	"POP",
+	"NOT",
     "COMMA",
     "PERCENTAGE",
     "LPAREN",
@@ -27,35 +24,23 @@ def t_REGNAME(t):
 	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
 	return t
 
-def t_MOVINS(t):
+def t_MOV(t):
 	r"movl"
 	return t
 
-def t_ADDINS(t):
-	r"addl"
+def t_ARITH(t):
+	r"(addl|subl|xorl|sarl)"
 	return t
 
-def t_SUBINS(t):
-	r"subl"
-	return t
-
-def t_XORINS(t):
-	r"xorl"
-	return t
-
-def t_SARINS(t):
-	r"sarl"
-	return t
-
-def t_NOTINS(t):
+def t_NOT(t):
 	r"notl"
 	return t
 
-def t_PUSHINS(t):
+def t_PUSH(t):
 	r"pushl"
 	return t
 
-def t_POPINS(t):
+def t_POP(t):
 	r"popl"
 	return t
 
@@ -88,51 +73,36 @@ from R86 import R86
 R86Processor = R86()
 
 def p_statement_move_to_register(p):
-    "statement : MOVINS source COMMA register"
+    "statement : MOV source COMMA register"
     R86Processor.setRegValue(p[2], p[4])
 
 def p_statement_move_to_memory_register(p):
-    "statement : MOVINS source COMMA LPAREN register RPAREN"
+    "statement : MOV source COMMA LPAREN register RPAREN"
     R86Processor.setMemory(p[2], R86Processor.getRegValue(p[5]))
 
 def p_statement_move_to_memory_number_register(p):
-    "statement : MOVINS source COMMA NUMBER LPAREN register RPAREN"
+    "statement : MOV source COMMA NUMBER LPAREN register RPAREN"
     R86Processor.setMemory(p[2], R86Processor.getRegValue(p[6]) + p[4])
 
 def p_statement_move_to_memory_number(p):
-    "statement : MOVINS source COMMA NUMBER"
+    "statement : MOV source COMMA NUMBER"
     R86Processor.setMemory(p[2], p[4])
 
-def p_statement_add(p):
-	"statement : ADDINS source COMMA register"
+def p_statement_arith(p):
+	"statement : ARITH source COMMA register"
 	R86Processor.arithOperate(p[1], p[2], p[4])
-	#arithOperate(self, vIns, vSource, vReg):
-	#arithOperate
-	#R86Processor.setRegValue(R86Processor.getRegValue(p[4]) + p[2], p[4])
-
-def p_statement_sub(p):
-	"statement : SUBINS source COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[4]) - p[2], p[4])
-
-def p_statement_xor(p):
-	"statement : XORINS source COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[4]) ^ p[2], p[4])
-
-def p_statement_sar(p):
-	"statement : SARINS DOLLAR NUMBER COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[5]) >> p[3], p[5])
 
 def p_statement_not(p):
-	"statement : NOTINS register"
+	"statement : NOT register"
 	R86Processor.setRegValue(~R86Processor.getRegValue(p[2]), p[2])
 
 def p_statement_push(p):
-	"statement : PUSHINS source"
+	"statement : PUSH source"
 	R86Processor.setRegValue(R86Processor.getRegValue("esp")-4, "esp")
 	R86Processor.setMemory(p[2], R86Processor.getRegValue("esp"))
 
 def p_statement_pop(p):
-	"statement : POPINS register"
+	"statement : POP register"
 	R86Processor.setRegValue(R86Processor.getMemory(R86Processor.getRegValue("esp")), p[2])
 	R86Processor.setRegValue(R86Processor.getRegValue("esp")+4, "esp")
 
