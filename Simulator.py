@@ -2,7 +2,6 @@ from Parser import yacc
 from Parser import R86Processor
 import argparse
 
-
 class Simulator:
 	def initMemory(self, vMin, vMax):
 		R86Processor.initMemory(vMin, vMax)

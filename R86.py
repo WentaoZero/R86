@@ -11,8 +11,14 @@ class R86:
 		self.arithDict = {}
 		self.arithDict["addl"] = lambda x, y: x + y
 		self.arithDict["subl"] = lambda x, y: x - y
+		self.arithDict["imul"] = lambda x, y: x * y
 		self.arithDict["xorl"] = lambda x, y: x ^ y
-		self.arithDict["sarl"] = lambda x, y: x >> y
+		self.arithDict["orl"]  = lambda x, y: x | y
+		self.arithDict["andl"] = lambda x, y: x & y
+
+		self.shiftDict = {}
+		self.shiftDict["sarl"] = lambda x, y: x >> y
+		self.shiftDict["sall"] = lambda x, y: x << y
 
 		self.RegisterTable = self.SegmentReg.RegisterTable.copy()
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)
@@ -41,6 +47,9 @@ class R86:
 
 	def arithOperate(self, vIns, vSource, vReg):
 		self.setRegValue(self.arithDict[vIns](self.getRegValue(vReg), vSource), vReg)
+
+	def shiftOperate(self, vIns, vNum, vReg):
+		self.setRegValue(self.shiftDict[vIns](self.getRegValue(vReg), vNum), vReg)
 
 	def printReg(self):
 		self.SegmentReg.printSelf()
