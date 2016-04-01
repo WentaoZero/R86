@@ -2,11 +2,11 @@ tokens = (
 	"REGNAME",
 	"DOLLAR",
     "MOV",
-    "ARITH",
+    "SINGLE_ARITH",
+    "DOUBLE_ARITH",
     "SHIFT",
 	"PUSH",
 	"POP",
-	"NOT",
     "COMMA",
     "PERCENTAGE",
     "LPAREN",
@@ -29,16 +29,16 @@ def t_MOV(t):
 	r"movl"
 	return t
 
-def t_ARITH(t):
+def t_SINGLE_ARITH(t):
+	r"(incl|decl|negl|notl)"
+	return t
+
+def t_DOUBLE_ARITH(t):
 	r"(addl|subl|imul|xorl|orl|andl)"
 	return t
 
 def t_SHIFT(t):
 	r"(sarl|sall)"
-	return t
-
-def t_NOT(t):
-	r"notl"
 	return t
 
 def t_PUSH(t):
@@ -93,17 +93,17 @@ def p_statement_move_to_memory_number(p):
     "statement : MOV source COMMA NUMBER"
     R86Processor.setMemory(p[2], p[4])
 
-def p_statement_arith(p):
-	"statement : ARITH source COMMA register"
-	R86Processor.arithOperate(p[1], p[2], p[4])
+def p_statement_single_arith(p):
+	"statement : SINGLE_ARITH register"
+	R86Processor.singleArithOperate(p[1], p[2])
+
+def p_statement_double_arith(p):
+	"statement : DOUBLE_ARITH source COMMA register"
+	R86Processor.doubleArithOperate(p[1], p[2], p[4])
 
 def p_statement_shift(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
 	R86Processor.shiftOperate(p[1], (int)(p[3]), p[5])
-
-def p_statement_not(p):
-	"statement : NOT register"
-	R86Processor.setRegValue(~R86Processor.getRegValue(p[2]), p[2])
 
 def p_statement_push(p):
 	"statement : PUSH source"
@@ -165,7 +165,7 @@ def p_expression_source(p):
 
 def p_error(p):
     print("Syntax error at '%s'" % p.value)
-    print("Sth wrong with: ")
+    print("Something wrong with: ")
     print(p)
 
 import ply.yacc as yacc

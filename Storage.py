@@ -12,8 +12,8 @@ class Storage:
 
 	def set(self, vVal, vAddress):
 		if vAddress > self.AddressMax or vAddress < self.AddressMin or vAddress%4!=0:
-			print("Illegal access to memory")
-			return
+			print("Illegal access to memory: {}".format(vAddress))
+			exit()
 		self.Content[vAddress] = vVal
 		if vAddress > self.AddressMax:
 			self.AddressMax = vAddress

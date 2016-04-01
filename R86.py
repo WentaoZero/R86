@@ -6,15 +6,21 @@ class R86:
 		self.SegmentReg = SegmentRegister()
 		self.IntegerReg = IntegerRegister()
 		self.SpecialReg = SpecialRegister()
-		self.Memory = Storage(5)
+		self.Memory = Storage(0)
 
-		self.arithDict = {}
-		self.arithDict["addl"] = lambda x, y: x + y
-		self.arithDict["subl"] = lambda x, y: x - y
-		self.arithDict["imul"] = lambda x, y: x * y
-		self.arithDict["xorl"] = lambda x, y: x ^ y
-		self.arithDict["orl"]  = lambda x, y: x | y
-		self.arithDict["andl"] = lambda x, y: x & y
+		self.SingleArithDict = {}
+		self.SingleArithDict["incl"] = lambda x: x + 1
+		self.SingleArithDict["decl"] = lambda x: x - 1
+		self.SingleArithDict["negl"] = lambda x: -x
+		self.SingleArithDict["notl"] = lambda x: ~x
+
+		self.DoubleArithDict = {}
+		self.DoubleArithDict["addl"] = lambda x, y: x + y
+		self.DoubleArithDict["subl"] = lambda x, y: x - y
+		self.DoubleArithDict["imul"] = lambda x, y: x * y
+		self.DoubleArithDict["xorl"] = lambda x, y: x ^ y
+		self.DoubleArithDict["orl"]  = lambda x, y: x | y
+		self.DoubleArithDict["andl"] = lambda x, y: x & y
 
 		self.shiftDict = {}
 		self.shiftDict["sarl"] = lambda x, y: x >> y
@@ -45,8 +51,11 @@ class R86:
 	def getMemory(self, vAddress):
 		return self.Memory.get(vAddress)
 
-	def arithOperate(self, vIns, vSource, vReg):
-		self.setRegValue(self.arithDict[vIns](self.getRegValue(vReg), vSource), vReg)
+	def singleArithOperate(self, vIns, vReg):
+		self.setRegValue(self.SingleArithDict[vIns](self.getRegValue(vReg)), vReg)
+
+	def doubleArithOperate(self, vIns, vSource, vReg):
+		self.setRegValue(self.DoubleArithDict[vIns](self.getRegValue(vReg), vSource), vReg)
 
 	def shiftOperate(self, vIns, vNum, vReg):
 		self.setRegValue(self.shiftDict[vIns](self.getRegValue(vReg), vNum), vReg)
