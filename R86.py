@@ -8,23 +8,23 @@ class R86:
 		self.SpecialReg = SpecialRegister()
 		self.Memory = Storage(0)
 
-		self.SingleArithDict = {}
-		self.SingleArithDict["incl"] = lambda x: x + 1
-		self.SingleArithDict["decl"] = lambda x: x - 1
-		self.SingleArithDict["negl"] = lambda x: -x
-		self.SingleArithDict["notl"] = lambda x: ~x
+		self.UnaryOperationDict = {}
+		self.UnaryOperationDict["incl"] = lambda x: x + 1
+		self.UnaryOperationDict["decl"] = lambda x: x - 1
+		self.UnaryOperationDict["negl"] = lambda x: -x
+		self.UnaryOperationDict["notl"] = lambda x: ~x
 
-		self.DoubleArithDict = {}
-		self.DoubleArithDict["addl"] = lambda x, y: x + y
-		self.DoubleArithDict["subl"] = lambda x, y: x - y
-		self.DoubleArithDict["imul"] = lambda x, y: x * y
-		self.DoubleArithDict["xorl"] = lambda x, y: x ^ y
-		self.DoubleArithDict["orl"]  = lambda x, y: x | y
-		self.DoubleArithDict["andl"] = lambda x, y: x & y
+		self.BinaryOperationDict = {}
+		self.BinaryOperationDict["addl"] = lambda x, y: x + y
+		self.BinaryOperationDict["subl"] = lambda x, y: x - y
+		self.BinaryOperationDict["imul"] = lambda x, y: x * y
+		self.BinaryOperationDict["xorl"] = lambda x, y: x ^ y
+		self.BinaryOperationDict["orl"]  = lambda x, y: x | y
+		self.BinaryOperationDict["andl"] = lambda x, y: x & y
 
-		self.shiftDict = {}
-		self.shiftDict["sarl"] = lambda x, y: x >> y
-		self.shiftDict["sall"] = lambda x, y: x << y
+		self.ShiftOperationDict = {}
+		self.ShiftOperationDict["sarl"] = lambda x, y: x >> y
+		self.ShiftOperationDict["sall"] = lambda x, y: x << y
 
 		self.RegisterTable = self.SegmentReg.RegisterTable.copy()
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)
@@ -51,14 +51,14 @@ class R86:
 	def getMemory(self, vAddress):
 		return self.Memory.get(vAddress)
 
-	def singleArithOperate(self, vIns, vReg):
-		self.setRegValue(self.SingleArithDict[vIns](self.getRegValue(vReg)), vReg)
+	def unaryOperate(self, vIns, vReg):
+		self.setRegValue(self.UnaryOperationDict[vIns](self.getRegValue(vReg)), vReg)
 
-	def doubleArithOperate(self, vIns, vSource, vReg):
-		self.setRegValue(self.DoubleArithDict[vIns](self.getRegValue(vReg), vSource), vReg)
+	def binaryOperate(self, vIns, vSource, vReg):
+		self.setRegValue(self.BinaryOperationDict[vIns](self.getRegValue(vReg), vSource), vReg)
 
 	def shiftOperate(self, vIns, vNum, vReg):
-		self.setRegValue(self.shiftDict[vIns](self.getRegValue(vReg), vNum), vReg)
+		self.setRegValue(self.ShiftOperationDict[vIns](self.getRegValue(vReg), vNum), vReg)
 
 	def printReg(self):
 		self.SegmentReg.printSelf()

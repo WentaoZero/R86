@@ -2,8 +2,8 @@ tokens = (
 	"REGNAME",
 	"DOLLAR",
     "MOV",
-    "SINGLE_ARITH",
-    "DOUBLE_ARITH",
+    "UNARY_ARITH",
+    "BINARY_ARITH",
     "SHIFT",
     "LEAL",
 	"PUSH",
@@ -30,11 +30,11 @@ def t_MOV(t):
 	r"movl"
 	return t
 
-def t_SINGLE_ARITH(t):
+def t_UNARY_ARITH(t):
 	r"(incl|decl|negl|notl)"
 	return t
 
-def t_DOUBLE_ARITH(t):
+def t_BINARY_ARITH(t):
 	r"(addl|subl|imul|xorl|orl|andl)"
 	return t
 
@@ -98,13 +98,13 @@ def p_statement_move_to_memory_number(p):
     "statement : MOV source COMMA NUMBER"
     R86Processor.setMemory(p[2], p[4])
 
-def p_statement_single_arith(p):
-	"statement : SINGLE_ARITH register"
-	R86Processor.singleArithOperate(p[1], p[2])
+def p_statement_unary_arith(p):
+	"statement : UNARY_ARITH register"
+	R86Processor.unaryOperate(p[1], p[2])
 
-def p_statement_double_arith(p):
-	"statement : DOUBLE_ARITH source COMMA register"
-	R86Processor.doubleArithOperate(p[1], p[2], p[4])
+def p_statement_binary_arith(p):
+	"statement : BINARY_ARITH source COMMA register"
+	R86Processor.binaryOperate(p[1], p[2], p[4])
 
 def p_statement_shift(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
