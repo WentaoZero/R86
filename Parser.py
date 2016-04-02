@@ -5,6 +5,7 @@ tokens = (
     "SINGLE_ARITH",
     "DOUBLE_ARITH",
     "SHIFT",
+    "LEAL",
 	"PUSH",
 	"POP",
     "COMMA",
@@ -39,6 +40,10 @@ def t_DOUBLE_ARITH(t):
 
 def t_SHIFT(t):
 	r"(sarl|sall)"
+	return t
+
+def t_LEAL(t):
+	r"leal"
 	return t
 
 def t_PUSH(t):
@@ -104,6 +109,26 @@ def p_statement_double_arith(p):
 def p_statement_shift(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
 	R86Processor.shiftOperate(p[1], (int)(p[3]), p[5])
+
+def p_statement_leal_number_register(p):
+	"statement : LEAL NUMBER LPAREN register RPAREN COMMA register"
+	R86Processor.setRegValue(R86Processor.getRegValue(p[4])+p[2], p[7])
+
+def p_statement_leal_register_register(p):
+	"statement : LEAL LPAREN register COMMA register RPAREN COMMA register"
+	R86Processor.setRegValue(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5]), p[8])
+
+def p_statement_leal_register_register_number(p):
+	"statement : LEAL LPAREN register COMMA register COMMA NUMBER RPAREN COMMA register"
+	R86Processor.setRegValue(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5])*p[7], p[10])
+
+def p_statement_leal_number_register_register_number(p):
+	"statement : LEAL NUMBER LPAREN register COMMA register COMMA NUMBER RPAREN COMMA register"
+	R86Processor.setRegValue(p[2]+R86Processor.getRegValue(p[4])+R86Processor.getRegValue(p[6])*p[8], p[11])
+
+def p_statement_leal_number_register_number(p):
+	"statement : LEAL NUMBER LPAREN COMMA register COMMA NUMBER RPAREN COMMA register"
+	R86Processor.setRegValue(p[2]+R86Processor.getRegValue(p[5])*p[7], p[10])
 
 def p_statement_push(p):
 	"statement : PUSH source"
