@@ -1,7 +1,6 @@
 tokens = (
 	"REGNAME",
 	"DOLLAR",
-    "MOV",
     "UNARY_ARITH",
     "BINARY_ARITH",
     "SHIFT",
@@ -26,16 +25,12 @@ def t_REGNAME(t):
 	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
 	return t
 
-def t_MOV(t):
-	r"movl"
-	return t
-
 def t_UNARY_ARITH(t):
 	r"(incl|decl|negl|notl)"
 	return t
 
 def t_BINARY_ARITH(t):
-	r"(addl|subl|imul|xorl|orl|andl)"
+	r"(movl|addl|subl|imul|xorl|orl|andl)"
 	return t
 
 def t_SHIFT(t):
@@ -82,68 +77,64 @@ lex.lex()
 from R86 import R86
 R86Processor = R86()
 
-def p_statement_move_to_register(p):
-    "statement : MOV source COMMA register"
-    R86Processor.setRegValue(p[2], p[4])
-
-def p_statement_move_to_memory_register(p):
-    "statement : MOV source COMMA LPAREN register RPAREN"
-    R86Processor.setMemory(p[2], R86Processor.getRegValue(p[5]))
-
-def p_statement_move_to_memory_number_register(p):
-    "statement : MOV source COMMA NUMBER LPAREN register RPAREN"
-    R86Processor.setMemory(p[2], R86Processor.getRegValue(p[6]) + p[4])
-
-def p_statement_move_to_memory_number(p):
-    "statement : MOV source COMMA NUMBER"
-    R86Processor.setMemory(p[2], p[4])
-
 def p_statement_unary_arith(p):
 	"statement : UNARY_ARITH register"
 	R86Processor.unaryOperate(p[1], p[2])
 
-def p_statement_binary_arith(p):
+def p_statement_binary_arith_register(p):
 	"statement : BINARY_ARITH source COMMA register"
-	R86Processor.binaryOperate(p[1], p[2], p[4])
+	R86Processor.setRegValueBySource(p[1], p[2], p[4])
+
+def p_statement_binary_arith_memory_register(p):
+    "statement : BINARY_ARITH source COMMA LPAREN register RPAREN"
+    R86Processor.setMemoryByReg(p[1], p[2], p[5])
+
+def p_statement_binary_arith_memory_number_register(p):
+	"statement : BINARY_ARITH source COMMA NUMBER LPAREN register RPAREN"
+	R86Processor.setMemoryByNumberReg(p[1], p[2], p[4], p[6])
+
+def p_statement_binary_arith_memory_number(p):
+    "statement : BINARY_ARITH source COMMA NUMBER"
+    R86Processor.setMemoryByNumber(p[1], p[2], p[4])
 
 def p_statement_shift(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
-	R86Processor.shiftOperate(p[1], (int)(p[3]), p[5])
+	R86Processor.shiftOperate(p[1], p[3], p[5])
 
 def p_statement_leal_number_register(p):
 	"statement : LEAL NUMBER LPAREN register RPAREN COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[4])+p[2], p[7])
+	R86Processor.setReg(R86Processor.getRegValue(p[4])+p[2], p[7])
 
 def p_statement_leal_register_register(p):
 	"statement : LEAL LPAREN register COMMA register RPAREN COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5]), p[8])
+	R86Processor.setReg(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5]), p[8])
 
 def p_statement_leal_register_register_number(p):
 	"statement : LEAL LPAREN register COMMA register COMMA NUMBER RPAREN COMMA register"
-	R86Processor.setRegValue(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5])*p[7], p[10])
+	R86Processor.setReg(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5])*p[7], p[10])
 
 def p_statement_leal_number_register_register_number(p):
 	"statement : LEAL NUMBER LPAREN register COMMA register COMMA NUMBER RPAREN COMMA register"
-	R86Processor.setRegValue(p[2]+R86Processor.getRegValue(p[4])+R86Processor.getRegValue(p[6])*p[8], p[11])
+	R86Processor.setReg(p[2]+R86Processor.getRegValue(p[4])+R86Processor.getRegValue(p[6])*p[8], p[11])
 
 def p_statement_leal_number_register_number(p):
 	"statement : LEAL NUMBER LPAREN COMMA register COMMA NUMBER RPAREN COMMA register"
-	R86Processor.setRegValue(p[2]+R86Processor.getRegValue(p[5])*p[7], p[10])
+	R86Processor.setReg(p[2]+R86Processor.getRegValue(p[5])*p[7], p[10])
 
 def p_statement_push(p):
 	"statement : PUSH source"
-	R86Processor.setRegValue(R86Processor.getRegValue("esp")-4, "esp")
+	R86Processor.setReg(R86Processor.getRegValue("esp")-4, "esp")
 	R86Processor.setMemory(p[2], R86Processor.getRegValue("esp"))
 
 def p_statement_pop(p):
 	"statement : POP register"
-	R86Processor.setRegValue(R86Processor.getMemory(R86Processor.getRegValue("esp")), p[2])
-	R86Processor.setRegValue(R86Processor.getRegValue("esp")+4, "esp")
+	R86Processor.setReg(R86Processor.getMemory(R86Processor.getRegValue("esp")), p[2])
+	R86Processor.setReg(R86Processor.getRegValue("esp")+4, "esp")
 
 def p_number(p):
 	"""NUMBER : DECNUM
 			  | HEXNUM"""
-	p[0] = p[1]
+	p[0] = (int)(p[1])
 
 def p_source_register(p):
     "source : register"

@@ -15,6 +15,7 @@ class R86:
 		self.UnaryOperationDict["notl"] = lambda x: ~x
 
 		self.BinaryOperationDict = {}
+		self.BinaryOperationDict["movl"] = lambda x, y: y
 		self.BinaryOperationDict["addl"] = lambda x, y: x + y
 		self.BinaryOperationDict["subl"] = lambda x, y: x - y
 		self.BinaryOperationDict["imul"] = lambda x, y: x * y
@@ -30,11 +31,16 @@ class R86:
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)
 		self.RegisterTable.update(self.SpecialReg.RegisterTable)
 
-	def setRegValue(self, vValue, vReg):
-	    try:
-	        self.RegisterTable[vReg].setValue(vValue)
-	    except LookupError:
-	        print("***\nRegister not found: [" + vReg + "]\n***")
+	#do be deleted
+
+	def setReg(self, vValue, vReg):
+		try:
+			self.RegisterTable[vReg].setValue(vValue)
+		except LookupError:
+			print("***\nRegister not found: [" + vReg + "]\n***")
+
+	def setRegValueBySource(self, vIns, vSource, vReg):
+		self.setReg(self.BinaryOperationDict[vIns](self.getRegValue(vReg), vSource), vReg)
 
 	def getRegValue(self, vReg):
 	    try:
@@ -48,17 +54,26 @@ class R86:
 	def setMemory(self, vValue, vAddress):
 		self.Memory.set(vValue, vAddress)
 
+	def setMemoryByReg(self, vBinaryIns, vSource, vReg):
+		TempAddress = self.getRegValue(vReg)
+		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getRegValue(vReg), vSource), TempAddress)
+
+	def setMemoryByNumberReg(self, vBinaryIns, vSource, vNum, vReg):
+		TempAddress = self.getRegValue(vReg)+vNum
+		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
+
+	def setMemoryByNumber(self, vBinaryIns, vSource, vNum):
+		TempAddress = vNum
+		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
+
 	def getMemory(self, vAddress):
 		return self.Memory.get(vAddress)
 
-	def unaryOperate(self, vIns, vReg):
-		self.setRegValue(self.UnaryOperationDict[vIns](self.getRegValue(vReg)), vReg)
-
-	def binaryOperate(self, vIns, vSource, vReg):
-		self.setRegValue(self.BinaryOperationDict[vIns](self.getRegValue(vReg), vSource), vReg)
+	def unaryOperate(self, vUnaryIns, vReg):
+		self.setReg(self.UnaryOperationDict[vUnaryIns](self.getRegValue(vReg)), vReg)
 
 	def shiftOperate(self, vIns, vNum, vReg):
-		self.setRegValue(self.ShiftOperationDict[vIns](self.getRegValue(vReg), vNum), vReg)
+		self.setReg(self.ShiftOperationDict[vIns](self.getRegValue(vReg), vNum), vReg)
 
 	def printReg(self):
 		self.SegmentReg.printSelf()

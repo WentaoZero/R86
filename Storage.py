@@ -22,7 +22,7 @@ class Storage:
 		try:
 			return self.Content[vAddress]
 		except LookupError:
-			print("Illegal access to memory")
+			print("Illegal access to memory: {}".format(vAddress))
 
 	def printSelf(self):
 		print(self.Name)
