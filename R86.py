@@ -18,7 +18,7 @@ class R86:
 		self.BinaryOperationDict["movl"] = lambda x, y: y
 		self.BinaryOperationDict["addl"] = lambda x, y: x + y
 		self.BinaryOperationDict["subl"] = lambda x, y: x - y
-		self.BinaryOperationDict["imul"] = lambda x, y: x * y
+		self.BinaryOperationDict["imull"] = lambda x, y: x * y
 		self.BinaryOperationDict["xorl"] = lambda x, y: x ^ y
 		self.BinaryOperationDict["orl"]  = lambda x, y: x | y
 		self.BinaryOperationDict["andl"] = lambda x, y: x & y
@@ -64,6 +64,10 @@ class R86:
 
 	def setMemoryByNum(self, vBinaryIns, vSource, vNum):
 		TempAddress = vNum
+		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
+
+	def setMemoryByRegRegScale(self, vBinaryIns, vSource, vFirstSourceReg, vSecondSourceReg, vScaleFactor):
+		TempAddress = self.getReg(vFirstSourceReg) + self.getReg(vSecondSourceReg) * vScaleFactor
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
 
 	def getMemory(self, vAddress):

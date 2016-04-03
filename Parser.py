@@ -30,7 +30,7 @@ def t_UNARY_ARITH(t):
 	return t
 
 def t_BINARY_ARITH(t):
-	r"(movl|addl|subl|imul|xorl|orl|andl)"
+	r"(movl|addl|subl|imull|xorl|orl|andl)"
 	return t
 
 def t_SHIFT(t):
@@ -93,6 +93,12 @@ def p_statement_binary_arith_register(p):
 def p_statement_binary_arith_memory_register(p):
     "statement : BINARY_ARITH source COMMA LPAREN register RPAREN"
     R86Processor.setMemoryByReg(p[1], p[2], p[5])
+
+def p_statement_binary_arith_memory_register_register_scale(p):
+	"""statement : BINARY_ARITH source COMMA LPAREN register COMMA register COMMA NUMBER RPAREN"""
+	Scale = p[9]
+	verifyScaleFactor(Scale)
+	R86Processor.setMemoryByRegRegScale(p[1], p[2], p[5], p[7], Scale)
 
 def p_statement_binary_arith_memory_number_register(p):
 	"statement : BINARY_ARITH source COMMA NUMBER LPAREN register RPAREN"
