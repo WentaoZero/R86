@@ -40,9 +40,9 @@ class R86:
 			print("***\nRegister not found: [" + vReg + "]\n***")
 
 	def setRegValueBySource(self, vIns, vSource, vReg):
-		self.setReg(self.BinaryOperationDict[vIns](self.getRegValue(vReg), vSource), vReg)
+		self.setReg(self.BinaryOperationDict[vIns](self.getReg(vReg), vSource), vReg)
 
-	def getRegValue(self, vReg):
+	def getReg(self, vReg):
 	    try:
 	        return self.RegisterTable[vReg].getValue()
 	    except LookupError:
@@ -55,25 +55,40 @@ class R86:
 		self.Memory.set(vValue, vAddress)
 
 	def setMemoryByReg(self, vBinaryIns, vSource, vReg):
-		TempAddress = self.getRegValue(vReg)
-		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getRegValue(vReg), vSource), TempAddress)
+		TempAddress = self.getReg(vReg)
+		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getReg(vReg), vSource), TempAddress)
 
-	def setMemoryByNumberReg(self, vBinaryIns, vSource, vNum, vReg):
-		TempAddress = self.getRegValue(vReg)+vNum
+	def setMemoryByNumReg(self, vBinaryIns, vSource, vNum, vReg):
+		TempAddress = self.getReg(vReg)+vNum
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
 
-	def setMemoryByNumber(self, vBinaryIns, vSource, vNum):
+	def setMemoryByNum(self, vBinaryIns, vSource, vNum):
 		TempAddress = vNum
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
 
 	def getMemory(self, vAddress):
 		return self.Memory.get(vAddress)
 
+	def leaNumReg(self, vNum, vSourceReg, vDestReg):
+		self.setReg(self.getReg(vSourceReg)+vNum,vDestReg)
+
+	def leaRegReg(self, vFirstSourceReg, vSecondSourceReg, vDestReg):
+		self.setReg(self.getReg(vFirstSourceReg)+self.getReg(vSecondSourceReg), vDestReg)
+
+	def leaRegRegNum(self, vFirstSourceReg, vSecondSourceReg, vNum, vDestReg):
+		self.setReg(self.getReg(vFirstSourceReg)+self.getReg(vSecondSourceReg)*vNum, vDestReg)
+
+	def leaNumRegRegScale(self, vNum, vFirstSourceReg, vSecondSourceReg, vScaleFactor, vDestReg):
+		self.setReg(vNum+self.getReg(vFirstSourceReg)+self.getReg(vSecondSourceReg)*vScaleFactor, vDestReg)
+
+	def leaNumRegScale(self, vNum, vSourceReg, vScale, vDestReg):
+		self.setReg(vNum+self.getReg(vSourceReg)*vScale, vDestReg)
+
 	def unaryOperate(self, vUnaryIns, vReg):
-		self.setReg(self.UnaryOperationDict[vUnaryIns](self.getRegValue(vReg)), vReg)
+		self.setReg(self.UnaryOperationDict[vUnaryIns](self.getReg(vReg)), vReg)
 
 	def shiftOperate(self, vIns, vNum, vReg):
-		self.setReg(self.ShiftOperationDict[vIns](self.getRegValue(vReg), vNum), vReg)
+		self.setReg(self.ShiftOperationDict[vIns](self.getReg(vReg), vNum), vReg)
 
 	def printReg(self):
 		self.SegmentReg.printSelf()

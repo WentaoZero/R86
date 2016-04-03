@@ -74,6 +74,11 @@ def t_error(t):
 import ply.lex as lex
 lex.lex()
 
+def verifyScaleFactor(vScale):
+	if vScale not in [1, 2, 4, 8]:
+		print("Illegal scale factor: {}".format(vScale))
+		exit()
+
 from R86 import R86
 R86Processor = R86()
 
@@ -91,11 +96,11 @@ def p_statement_binary_arith_memory_register(p):
 
 def p_statement_binary_arith_memory_number_register(p):
 	"statement : BINARY_ARITH source COMMA NUMBER LPAREN register RPAREN"
-	R86Processor.setMemoryByNumberReg(p[1], p[2], p[4], p[6])
+	R86Processor.setMemoryByNumReg(p[1], p[2], p[4], p[6])
 
 def p_statement_binary_arith_memory_number(p):
     "statement : BINARY_ARITH source COMMA NUMBER"
-    R86Processor.setMemoryByNumber(p[1], p[2], p[4])
+    R86Processor.setMemoryByNum(p[1], p[2], p[4])
 
 def p_statement_shift(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
@@ -103,33 +108,39 @@ def p_statement_shift(p):
 
 def p_statement_leal_number_register(p):
 	"statement : LEAL NUMBER LPAREN register RPAREN COMMA register"
-	R86Processor.setReg(R86Processor.getRegValue(p[4])+p[2], p[7])
+	R86Processor.leaNumReg(p[2], p[4], p[7])
 
 def p_statement_leal_register_register(p):
 	"statement : LEAL LPAREN register COMMA register RPAREN COMMA register"
-	R86Processor.setReg(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5]), p[8])
+	R86Processor.leaRegReg(p[3], p[5], p[8])
 
-def p_statement_leal_register_register_number(p):
+def p_statement_leal_register_register_scale(p):
 	"statement : LEAL LPAREN register COMMA register COMMA NUMBER RPAREN COMMA register"
-	R86Processor.setReg(R86Processor.getRegValue(p[3])+R86Processor.getRegValue(p[5])*p[7], p[10])
+	ScaleFactor = p[7]
+	verifyScaleFactor(ScaleFactor)
+	R86Processor.leaRegRegNum(p[3], p[5], ScaleFactor, p[10])
 
-def p_statement_leal_number_register_register_number(p):
+def p_statement_leal_number_register_register_scale(p):
 	"statement : LEAL NUMBER LPAREN register COMMA register COMMA NUMBER RPAREN COMMA register"
-	R86Processor.setReg(p[2]+R86Processor.getRegValue(p[4])+R86Processor.getRegValue(p[6])*p[8], p[11])
+	ScaleFactor = p[8]
+	verifyScaleFactor(ScaleFactor)
+	R86Processor.leaNumRegRegScale(p[2], p[4], p[6], ScaleFactor, p[11])
 
-def p_statement_leal_number_register_number(p):
+def p_statement_leal_number_register_scale(p):
 	"statement : LEAL NUMBER LPAREN COMMA register COMMA NUMBER RPAREN COMMA register"
-	R86Processor.setReg(p[2]+R86Processor.getRegValue(p[5])*p[7], p[10])
+	ScaleFactor = p[7]
+	verifyScaleFactor(ScaleFactor)
+	R86Processor.leaNumRegScale(p[2], p[5], ScaleFactor, p[10])
 
 def p_statement_push(p):
 	"statement : PUSH source"
-	R86Processor.setReg(R86Processor.getRegValue("esp")-4, "esp")
-	R86Processor.setMemory(p[2], R86Processor.getRegValue("esp"))
+	R86Processor.setReg(R86Processor.getReg("esp")-4, "esp")
+	R86Processor.setMemory(p[2], R86Processor.getReg("esp"))
 
 def p_statement_pop(p):
 	"statement : POP register"
-	R86Processor.setReg(R86Processor.getMemory(R86Processor.getRegValue("esp")), p[2])
-	R86Processor.setReg(R86Processor.getRegValue("esp")+4, "esp")
+	R86Processor.setReg(R86Processor.getMemory(R86Processor.getReg("esp")), p[2])
+	R86Processor.setReg(R86Processor.getReg("esp")+4, "esp")
 
 def p_number(p):
 	"""NUMBER : DECNUM
@@ -139,7 +150,7 @@ def p_number(p):
 def p_source_register(p):
     "source : register"
     try:
-        p[0] = R86Processor.getRegValue(p[1])
+        p[0] = R86Processor.getReg(p[1])
     except LookupError:
         print("Unknown register '%s'" % p[1])
         p[0] = 0
@@ -158,11 +169,11 @@ def p_memory_as_source_number(p):
 
 def p_memory_as_source_register(p):
 	"memory_as_source : LPAREN register RPAREN"
-	p[0] = R86Processor.getMemory(R86Processor.getRegValue(p[2]))
+	p[0] = R86Processor.getMemory(R86Processor.getReg(p[2]))
 
 def p_memory_as_source_number_and_register(p):
 	"memory_as_source : NUMBER LPAREN register RPAREN"
-	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]))
+	p[0] = R86Processor.getMemory(p[1] + R86Processor.getReg(p[3]))
 
 def p_memory_as_source_double_register(p):
 	"memory_as_source : LPAREN register COMMA register RPAREN"
@@ -170,7 +181,7 @@ def p_memory_as_source_double_register(p):
 
 def p_memory_as_source_number_double_register(p):
 	"memory_as_source : NUMBER LPAREN register COMMA register RPAREN"
-	p[0] = R86Processor.getMemory(p[1] + R86Processor.getRegValue(p[3]) + R86Processor.getRegValue(p[5]))
+	p[0] = R86Processor.getMemory(p[1] + R86Processor.getReg(p[3]) + R86Processor.getReg(p[5]))
 
 def p_register(p):
 	"register : PERCENTAGE REGNAME"
