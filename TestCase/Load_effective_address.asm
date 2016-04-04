@@ -17,4 +17,5 @@
 ;	leal 7(%eax, %eax, 8), %edx
 ;	leal 0xA(, %ecx, 4), %edx
 ;	leal 9(%eax, %ecx, 2), %edx
+
 	popl %ebp
