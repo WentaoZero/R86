@@ -54,19 +54,58 @@ class R86:
 	def setMemory(self, vValue, vAddress):
 		self.Memory.set(vValue, vAddress)
 
-	def setMemoryByReg(self, vBinaryIns, vSource, vReg):
+	def unary_oeprate_source_reg(self, vUnaryIns, vReg):
+		self.setReg(self.UnaryOperationDict[vUnaryIns](self.getReg(vReg)), vReg)
+
+	def unary_operate_memory_num(self, vUnaryIns, vNum):
+		TempAddress = vNum
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_reg(self, vUnaryIns, vReg):
+		TempAddress = self.getReg(vReg)
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_num_reg(self, vUnaryIns, vNum, vReg):
+		TempAddress = vNum + self.getReg(vReg)
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_reg_reg(self, vUnaryIns, vFirstReg, vSecondReg):
+		TempAddress = self.getReg(vFirstReg) + self.getReg(vSecondReg)
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_num_reg_reg(self, vUnaryIns, vNum, vFirstReg, vSecondReg):
+		TempAddress = vNum + self.getReg(vFirstReg) + self.getReg(vSecondReg)
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_reg_scale(self, vUnaryIns, vReg, vScaleFactor):
+		TempAddress = self.getReg(vReg) * vScaleFactor
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_num_reg_scale(self, vUnaryIns, vNum, vReg, vScaleFactor):
+		TempAddress = self.getReg(vReg) * vScaleFactor + vNum
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_reg_reg_scale(self, vUnaryIns, vFirstReg, vSecondReg, vScaleFactor):
+		TempAddress = self.getReg(vFirstReg) + self.getReg(vSecondReg) * vScaleFactor
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def unary_operate_memory_num_reg_reg_scale(self, vUnaryIns, vNum, vFirstReg, vSecondReg, vScaleFactor):
+		TempAddress = vNum + self.getReg(vFirstReg) + self.getReg(vSecondReg) * vScaleFactor
+		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+
+	def binary_operate_source_reg(self, vBinaryIns, vSource, vReg):
 		TempAddress = self.getReg(vReg)
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getReg(vReg), vSource), TempAddress)
 
-	def setMemoryByNumReg(self, vBinaryIns, vSource, vNum, vReg):
+	def binary_operate_source_num_reg(self, vBinaryIns, vSource, vNum, vReg):
 		TempAddress = self.getReg(vReg)+vNum
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
 
-	def setMemoryByNum(self, vBinaryIns, vSource, vNum):
+	def binary_operate_source_num(self, vBinaryIns, vSource, vNum):
 		TempAddress = vNum
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
 
-	def setMemoryByRegRegScale(self, vBinaryIns, vSource, vFirstSourceReg, vSecondSourceReg, vScaleFactor):
+	def binary_operate_source_reg_reg_scale(self, vBinaryIns, vSource, vFirstSourceReg, vSecondSourceReg, vScaleFactor):
 		TempAddress = self.getReg(vFirstSourceReg) + self.getReg(vSecondSourceReg) * vScaleFactor
 		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
 
@@ -87,9 +126,6 @@ class R86:
 
 	def leaNumRegScale(self, vNum, vSourceReg, vScale, vDestReg):
 		self.setReg(vNum+self.getReg(vSourceReg)*vScale, vDestReg)
-
-	def unaryOperate(self, vUnaryIns, vReg):
-		self.setReg(self.UnaryOperationDict[vUnaryIns](self.getReg(vReg)), vReg)
 
 	def shiftOperate(self, vIns, vNum, vReg):
 		self.setReg(self.ShiftOperationDict[vIns](self.getReg(vReg), vNum), vReg)

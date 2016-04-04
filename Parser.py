@@ -82,9 +82,53 @@ def verifyScaleFactor(vScale):
 from R86 import R86
 R86Processor = R86()
 
-def p_statement_unary_arith(p):
+def p_statement_unary_arith_reg(p):
 	"statement : UNARY_ARITH register"
-	R86Processor.unaryOperate(p[1], p[2])
+	R86Processor.unary_oeprate_source_reg(p[1], p[2])
+
+def p_statement_unary_arith_memory_num(p):
+	"statement : UNARY_ARITH NUMBER"
+	R86Processor.unary_operate_memory_num(p[1], p[2])
+
+def p_statement_unary_arith_memory_reg(p):
+	"statement : UNARY_ARITH LPAREN register RPAREN"
+	R86Processor.unary_operate_memory_reg(p[1], p[3])
+
+def p_statement_unary_arith_memory_num_reg(p):
+	"statement : UNARY_ARITH NUMBER LPAREN register RPAREN"
+	R86Processor.unary_operate_memory_num_reg(p[1], p[2], p[4])
+
+def p_statement_unary_arith_memory_reg_reg(p):
+	"statement : UNARY_ARITH LPAREN register COMMA register RPAREN"
+	R86Processor.unary_operate_memory_reg_reg(p[1], p[3], p[5])
+
+def p_statement_unary_arith_memory_num_reg_reg(p):
+	"statement : UNARY_ARITH NUMBER LPAREN register COMMA register RPAREN"
+	R86Processor.unary_operate_memory_num_reg_reg(p[1], p[2], p[4], p[6])
+
+def p_statement_unary_arith_memory_reg_scale(p):
+	"statement : UNARY_ARITH LPAREN COMMA register COMMA NUMBER RPAREN"
+	Scale = p[6]
+	verifyScaleFactor(Scale)
+	R86Processor.unary_operate_memory_reg_scale(p[1], p[4], Scale)
+
+def p_statement_unary_arith_memory_num_reg_scale(p):
+	"statement : UNARY_ARITH NUMBER LPAREN COMMA register COMMA NUMBER RPAREN"
+	Scale = p[7]
+	verifyScaleFactor(Scale)
+	R86Processor.unary_operate_memory_num_reg_scale(p[1], p[2], p[5], Scale)
+
+def p_statement_unary_arith_memory_reg_reg_scale(p):
+	"statement : UNARY_ARITH LPAREN register COMMA register COMMA NUMBER RPAREN"
+	Scale = p[7]
+	verifyScaleFactor(Scale)
+	R86Processor.unary_operate_memory_reg_reg_scale(p[1], p[3], p[5], Scale)
+
+def p_statement_unary_arith_memory_num_reg_reg_scale(p):
+	"statement : UNARY_ARITH NUMBER LPAREN register COMMA register COMMA NUMBER RPAREN"
+	Scale = p[8]
+	verifyScaleFactor(Scale)
+	R86Processor.unary_operate_memory_num_reg_reg_scale(p[1], p[2], p[4], p[6], Scale)
 
 def p_statement_binary_arith_register(p):
 	"statement : BINARY_ARITH source COMMA register"
@@ -92,21 +136,21 @@ def p_statement_binary_arith_register(p):
 
 def p_statement_binary_arith_memory_register(p):
     "statement : BINARY_ARITH source COMMA LPAREN register RPAREN"
-    R86Processor.setMemoryByReg(p[1], p[2], p[5])
+    R86Processor.binary_operate_source_reg(p[1], p[2], p[5])
 
 def p_statement_binary_arith_memory_register_register_scale(p):
 	"""statement : BINARY_ARITH source COMMA LPAREN register COMMA register COMMA NUMBER RPAREN"""
 	Scale = p[9]
 	verifyScaleFactor(Scale)
-	R86Processor.setMemoryByRegRegScale(p[1], p[2], p[5], p[7], Scale)
+	R86Processor.binary_operate_source_reg_reg_scale(p[1], p[2], p[5], p[7], Scale)
 
 def p_statement_binary_arith_memory_number_register(p):
 	"statement : BINARY_ARITH source COMMA NUMBER LPAREN register RPAREN"
-	R86Processor.setMemoryByNumReg(p[1], p[2], p[4], p[6])
+	R86Processor.binary_operate_source_num_reg(p[1], p[2], p[4], p[6])
 
 def p_statement_binary_arith_memory_number(p):
     "statement : BINARY_ARITH source COMMA NUMBER"
-    R86Processor.setMemoryByNum(p[1], p[2], p[4])
+    R86Processor.binary_operate_source_num(p[1], p[2], p[4])
 
 def p_statement_shift(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
