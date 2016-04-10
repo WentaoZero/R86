@@ -8,6 +8,10 @@ class R86:
 		self.SpecialReg = SpecialRegister()
 		self.Memory = Storage(0)
 
+		self.code_segment = []
+		self.label_table = {}
+		self.EIP         = 0;
+
 		self.UnaryOperationDict = {}
 		self.UnaryOperationDict["incl"] = lambda x: x + 1
 		self.UnaryOperationDict["decl"] = lambda x: x - 1
@@ -30,8 +34,6 @@ class R86:
 		self.RegisterTable = self.SegmentReg.RegisterTable.copy()
 		self.RegisterTable.update(self.IntegerReg.RegisterTable)
 		self.RegisterTable.update(self.SpecialReg.RegisterTable)
-
-	#do be deleted
 
 	def setReg(self, vValue, vReg):
 		try:

@@ -1,6 +1,9 @@
 tokens = (
 	"REGNAME",
 	"DOLLAR",
+	"COLON",
+	"LABEL",
+	"JUMP",
     "UNARY_ARITH",
     "BINARY_ARITH",
     "SHIFT",
@@ -17,9 +20,18 @@ tokens = (
 
 t_DOLLAR     = r"\$"
 t_PERCENTAGE = r"\%"
-t_COMMA  = r","
+t_COMMA  = r"\,"
 t_LPAREN = r"\("
 t_RPAREN = r"\)"
+t_COLON = r"\:"
+
+def t_LABEL(t):
+	r"\.[a-zA-Z]+[a-zA-Z0-9]*"
+	return t
+
+def t_JUMP(t):
+	r"jmp"
+	return t
 
 def t_REGNAME(t):
 	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
@@ -82,6 +94,24 @@ def verifyScaleFactor(vScale):
 from R86 import R86
 R86Processor = R86()
 
+def p_statement_jump_label(p):
+	"statement : JUMP LABEL"
+	R86Processor.EIP = R86Processor.label_table[p[2][1:]]
+	#jump to EIP
+	#print("jump to {}".format(R86Processor.code_segment[R86Processor.EIP]))
+	#print("EIP = {}".format(R86Processor.EIP))
+	#print("found jump")
+	#exit()
+
+def p_statement_label(p):
+	"statement : LABEL COLON"
+	#do nothing
+
+	#print("label found")
+	#print("label = {}".format(p[1]))
+	#print("locate = {}".format(R86Processor.label_table[p[1][1:]]))
+	#exit()
+
 def p_statement_unary_arith_reg(p):
 	"statement : UNARY_ARITH register"
 	R86Processor.unary_oeprate_source_reg(p[1], p[2])
@@ -139,7 +169,7 @@ def p_statement_binary_arith_memory_register(p):
     R86Processor.binary_operate_source_reg(p[1], p[2], p[5])
 
 def p_statement_binary_arith_memory_register_register_scale(p):
-	"""statement : BINARY_ARITH source COMMA LPAREN register COMMA register COMMA NUMBER RPAREN"""
+	"statement : BINARY_ARITH source COMMA LPAREN register COMMA register COMMA NUMBER RPAREN"
 	Scale = p[9]
 	verifyScaleFactor(Scale)
 	R86Processor.binary_operate_source_reg_reg_scale(p[1], p[2], p[5], p[7], Scale)
