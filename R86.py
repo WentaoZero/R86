@@ -1,145 +1,146 @@
 from Register import SegmentRegister, IntegerRegister, SpecialRegister
-from Storage  import Storage
+from Memory  import Memory
 
 class R86:
 	def __init__(self):
-		self.SegmentReg = SegmentRegister()
-		self.IntegerReg = IntegerRegister()
-		self.SpecialReg = SpecialRegister()
-		self.Memory = Storage(0)
+		self.segment_register = SegmentRegister()
+		self.integer_register = IntegerRegister()
+		self.special_register = SpecialRegister()
+		self.memory = Memory()
 
-		self.code_segment = []
-		self.label_table = {}
-		self.EIP         = 0;
+		self.code_segment    = []
+		self.label_table     = {}
+		self.EIP = 0;
+		# TODO:
 
-		self.UnaryOperationDict = {}
-		self.UnaryOperationDict["incl"] = lambda x: x + 1
-		self.UnaryOperationDict["decl"] = lambda x: x - 1
-		self.UnaryOperationDict["negl"] = lambda x: -x
-		self.UnaryOperationDict["notl"] = lambda x: ~x
+		self.unary_operation_dict = {}
+		self.unary_operation_dict["incl"] = lambda x: x + 1
+		self.unary_operation_dict["decl"] = lambda x: x - 1
+		self.unary_operation_dict["negl"] = lambda x: -x
+		self.unary_operation_dict["notl"] = lambda x: ~x
 
-		self.BinaryOperationDict = {}
-		self.BinaryOperationDict["movl"] = lambda x, y: y
-		self.BinaryOperationDict["addl"] = lambda x, y: x + y
-		self.BinaryOperationDict["subl"] = lambda x, y: x - y
-		self.BinaryOperationDict["imull"] = lambda x, y: x * y
-		self.BinaryOperationDict["xorl"] = lambda x, y: x ^ y
-		self.BinaryOperationDict["orl"]  = lambda x, y: x | y
-		self.BinaryOperationDict["andl"] = lambda x, y: x & y
+		self.binary_operation_dict = {}
+		self.binary_operation_dict["movl"]  = lambda x, y: y
+		self.binary_operation_dict["addl"]  = lambda x, y: x + y
+		self.binary_operation_dict["subl"]  = lambda x, y: x - y
+		self.binary_operation_dict["imull"] = lambda x, y: x * y
+		self.binary_operation_dict["orl"]  = lambda x, y: x | y
+		self.binary_operation_dict["andl"] = lambda x, y: x & y
+		self.binary_operation_dict["xorl"] = lambda x, y: x ^ y
 
-		self.ShiftOperationDict = {}
-		self.ShiftOperationDict["sarl"] = lambda x, y: x >> y
-		self.ShiftOperationDict["sall"] = lambda x, y: x << y
+		self.shift_operation_dict = {}
+		self.shift_operation_dict["sarl"] = lambda x, y: x >> y
+		self.shift_operation_dict["sall"] = lambda x, y: x << y
 
-		self.RegisterTable = self.SegmentReg.RegisterTable.copy()
-		self.RegisterTable.update(self.IntegerReg.RegisterTable)
-		self.RegisterTable.update(self.SpecialReg.RegisterTable)
+		self.register_table = self.segment_register.register_table.copy()
+		self.register_table.update(self.integer_register.register_table)
+		self.register_table.update(self.special_register.register_table)
 
-	def setReg(self, vValue, vReg):
+	def set_reg(self, _value, _reg):
 		try:
-			self.RegisterTable[vReg].setValue(vValue)
+			self.register_table[_reg].set_value(_value)
 		except LookupError:
-			print("***\nRegister not found: [" + vReg + "]\n***")
+			print("***\nRegister not found: [" + _reg + "]\n***")
 
-	def setRegValueBySource(self, vIns, vSource, vReg):
-		self.setReg(self.BinaryOperationDict[vIns](self.getReg(vReg), vSource), vReg)
+	def set_reg_value_by_source(self, _ins, _source, _reg):
+		self.set_reg(self.binary_operation_dict[_ins](self.get_reg(_reg), _source), _reg)
 
-	def getReg(self, vReg):
+	def get_reg(self, _reg):
 	    try:
-	        return self.RegisterTable[vReg].getValue()
+	        return self.register_table[_reg].get_value()
 	    except LookupError:
-	    	print("***\nRegister not found: [" + vReg + "]\n***")
+	    	print("***\nRegister not found: [" + _reg + "]\n***")
 
-	def initMemory(self, vMin, vMax):
-		self.Memory.init(vMin, vMax)
+	def init_memory(self, _min, _max):
+		self.memory.init(_min, _max)
 
-	def setMemory(self, vValue, vAddress):
-		self.Memory.set(vValue, vAddress)
+	def set_memory(self, _value, _address):
+		self.memory.set(_value, _address)
 
-	def unary_oeprate_source_reg(self, vUnaryIns, vReg):
-		self.setReg(self.UnaryOperationDict[vUnaryIns](self.getReg(vReg)), vReg)
+	def unary_oeprate_source_reg(self, _unary_ins, _reg):
+		self.set_reg(self.unary_operation_dict[_unary_ins](self.get_reg(_reg)), _reg)
 
-	def unary_operate_memory_num(self, vUnaryIns, vNum):
-		TempAddress = vNum
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_num(self, _unary_ins, _num):
+		address = _num
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_reg(self, vUnaryIns, vReg):
-		TempAddress = self.getReg(vReg)
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_reg(self, _unary_ins, _reg):
+		address = self.get_reg(_reg)
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_num_reg(self, vUnaryIns, vNum, vReg):
-		TempAddress = vNum + self.getReg(vReg)
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_num_reg(self, _unary_ins, _num, _reg):
+		address = _num + self.get_reg(_reg)
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_reg_reg(self, vUnaryIns, vFirstReg, vSecondReg):
-		TempAddress = self.getReg(vFirstReg) + self.getReg(vSecondReg)
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_reg_reg(self, _unary_ins, _first_reg, _second_reg):
+		address = self.get_reg(_first_reg) + self.get_reg(_second_reg)
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_num_reg_reg(self, vUnaryIns, vNum, vFirstReg, vSecondReg):
-		TempAddress = vNum + self.getReg(vFirstReg) + self.getReg(vSecondReg)
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_num_reg_reg(self, _unary_ins, _num, _first_reg, _second_reg):
+		address = _num + self.get_reg(_first_reg) + self.get_reg(_second_reg)
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_reg_scale(self, vUnaryIns, vReg, vScaleFactor):
-		TempAddress = self.getReg(vReg) * vScaleFactor
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_reg_scale(self, _unary_ins, _reg, _scale_factor):
+		address = self.get_reg(_reg) * _scale_factor
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_num_reg_scale(self, vUnaryIns, vNum, vReg, vScaleFactor):
-		TempAddress = self.getReg(vReg) * vScaleFactor + vNum
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_num_reg_scale(self, _unary_ins, _num, _reg, _scale_factor):
+		address = self.get_reg(_reg) * _scale_factor + _num
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_reg_reg_scale(self, vUnaryIns, vFirstReg, vSecondReg, vScaleFactor):
-		TempAddress = self.getReg(vFirstReg) + self.getReg(vSecondReg) * vScaleFactor
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_reg_reg_scale(self, _unary_ins, _first_reg, _second_reg, _scale_factor):
+		address = self.get_reg(_first_reg) + self.get_reg(_second_reg) * _scale_factor
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def unary_operate_memory_num_reg_reg_scale(self, vUnaryIns, vNum, vFirstReg, vSecondReg, vScaleFactor):
-		TempAddress = vNum + self.getReg(vFirstReg) + self.getReg(vSecondReg) * vScaleFactor
-		self.setMemory(self.UnaryOperationDict[vUnaryIns](self.getMemory(TempAddress)), TempAddress)
+	def unary_operate_memory_num_reg_reg_scale(self, _unary_ins, _num, _first_reg, _second_reg, _scale_factor):
+		address = _num + self.get_reg(_first_reg) + self.get_reg(_second_reg) * _scale_factor
+		self.set_memory(self.unary_operation_dict[_unary_ins](self.get_memory(address)), address)
 
-	def binary_operate_source_reg(self, vBinaryIns, vSource, vReg):
-		TempAddress = self.getReg(vReg)
-		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getReg(vReg), vSource), TempAddress)
+	def binary_operate_source_reg(self, _binary_ins, _source, _reg):
+		address = self.get_reg(_reg)
+		self.set_memory(self.binary_operation_dict[_binary_ins](self.get_reg(_reg), _source), address)
 
-	def binary_operate_source_num_reg(self, vBinaryIns, vSource, vNum, vReg):
-		TempAddress = self.getReg(vReg)+vNum
-		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
+	def binary_operate_source_num_reg(self, _binary_ins, _source, _num, _reg):
+		address = self.get_reg(_reg)+_num
+		self.set_memory(self.binary_operation_dict[_binary_ins](self.get_memory(address), _source), address)
 
-	def binary_operate_source_num(self, vBinaryIns, vSource, vNum):
-		TempAddress = vNum
-		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
+	def binary_operate_source_num(self, _binary_ins, _source, _num):
+		address = _num
+		self.set_memory(self.binary_operation_dict[_binary_ins](self.get_memory(address), _source), address)
 
-	def binary_operate_source_reg_reg_scale(self, vBinaryIns, vSource, vFirstSourceReg, vSecondSourceReg, vScaleFactor):
-		TempAddress = self.getReg(vFirstSourceReg) + self.getReg(vSecondSourceReg) * vScaleFactor
-		self.setMemory(self.BinaryOperationDict[vBinaryIns](self.getMemory(TempAddress), vSource), TempAddress)
+	def binary_operate_source_reg_reg_scale(self, _binary_ins, _source, _first_source_reg, _second_source_reg, _scale_factor):
+		address = self.get_reg(_first_source_reg) + self.get_reg(_second_source_reg) * _scale_factor
+		self.set_memory(self.binary_operation_dict[_binary_ins](self.get_memory(address), _source), address)
 
-	def getMemory(self, vAddress):
-		return self.Memory.get(vAddress)
+	def get_memory(self, _address):
+		return self.memory.get(_address)
 
-	def leaNumReg(self, vNum, vSourceReg, vDestReg):
-		self.setReg(self.getReg(vSourceReg)+vNum,vDestReg)
+	def lea_num_reg(self, _num, _source_reg, _dest_reg):
+		self.set_reg(self.get_reg(_source_reg)+_num,_dest_reg)
 
-	def leaRegReg(self, vFirstSourceReg, vSecondSourceReg, vDestReg):
-		self.setReg(self.getReg(vFirstSourceReg)+self.getReg(vSecondSourceReg), vDestReg)
+	def lea_reg_reg(self, _first_source_reg, _second_source_reg, _dest_reg):
+		self.set_reg(self.get_reg(_first_source_reg)+self.get_reg(_second_source_reg), _dest_reg)
 
-	def leaRegRegNum(self, vFirstSourceReg, vSecondSourceReg, vNum, vDestReg):
-		self.setReg(self.getReg(vFirstSourceReg)+self.getReg(vSecondSourceReg)*vNum, vDestReg)
+	def lea_reg_reg_num(self, _first_source_reg, _second_source_reg, _num, _dest_reg):
+		self.set_reg(self.get_reg(_first_source_reg)+self.get_reg(_second_source_reg)*_num, _dest_reg)
 
-	def leaNumRegRegScale(self, vNum, vFirstSourceReg, vSecondSourceReg, vScaleFactor, vDestReg):
-		self.setReg(vNum+self.getReg(vFirstSourceReg)+self.getReg(vSecondSourceReg)*vScaleFactor, vDestReg)
+	def lea_num_reg_reg_scale(self, _num, _first_source_reg, _second_source_reg, _scale_factor, _dest_reg):
+		self.set_reg(_num+self.get_reg(_first_source_reg)+self.get_reg(_second_source_reg)*_scale_factor, _dest_reg)
 
-	def leaNumRegScale(self, vNum, vSourceReg, vScale, vDestReg):
-		self.setReg(vNum+self.getReg(vSourceReg)*vScale, vDestReg)
+	def lea_num_reg_scale(self, _num, _source_reg, _scale_factor, _dest_reg):
+		self.set_reg(_num+self.get_reg(_source_reg)*_scale_factor, _dest_reg)
 
-	def shiftOperate(self, vIns, vNum, vReg):
-		self.setReg(self.ShiftOperationDict[vIns](self.getReg(vReg), vNum), vReg)
+	def shift_operate(self, _ins, _num, _reg):
+		self.set_reg(self.shift_operation_dict[_ins](self.get_reg(_reg), _num), _reg)
 
-	def printReg(self):
-		self.SegmentReg.printSelf()
-		self.IntegerReg.printSelf()
-		self.SpecialReg.printSelf()
+	def print_register(self):
+		self.segment_register.print_self()
+		self.integer_register.print_self()
+		self.special_register.print_self()
 
-	def printMemory(self):
-		self.Memory.printSelf()
+	def print_memory(self):
+		self.memory.print_self()
 
-	def printSelf(self):
-		self.printReg()
-		self.printMemory()
+	def print_self(self):
+		self.print_register()
+		self.print_memory()

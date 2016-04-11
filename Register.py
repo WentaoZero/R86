@@ -1,48 +1,48 @@
 class AtomRegister:
-	def __init__(self, vName, vValue=0):
-		self.Name  = vName
-		self.Value = vValue
+	def __init__(self, _name):
+		self.name  = _name
+		self.value = 0
 
-	def getName(self):
-		return self.Name
+	def get_name(self):
+		return self.name
 
-	def setValue(self, vValue):
-		self.Value = vValue
+	def set_value(self, _value):
+		self.value = _value
 
-	def getValue(self):
-		return self.Value
+	def get_value(self):
+		return self.value
 
-	def printSelf(self):
-		print("%" + self.Name + " = " + str(self.Value))
+	def print_self(self):
+		print("%" + self.name + " = " + str(self.value))
 
 class RegisterBaseV(object):
-	def collectSubRegister(self):
-		RegTable = dict()
-		for reg in self.RegisterList:
-			RegTable[reg.getName()] = reg
-		return RegTable
+	def collect_sub_register(self):
+		reg_table = dict()
+		for reg in self.register_list:
+			reg_table[reg.get_name()] = reg
+		return reg_table
 
-	def printSelf(self):
-		print(self.Name)
-		for reg in self.RegisterList:
-			reg.printSelf()
+	def print_self(self):
+		print(self.name)
+		for reg in self.register_list:
+			reg.print_self()
 		print("")
 
 class SegmentRegister(RegisterBaseV):
 	def __init__(self):
-		self.Name = "SEGMENT REGISTER"
-		self.CS = AtomRegister("cs")
-		self.SS = AtomRegister("ss")
-		self.DS = AtomRegister("ds")
-		self.RegisterList  = [self.CS, self.SS, self.DS]
-		self.RegisterTable = super(SegmentRegister, self).collectSubRegister()
+		self.name = "SEGMENT REGISTER"
+		self.code_segment  = AtomRegister("cs")
+		self.stack_segment = AtomRegister("ss")
+		self.data_segment  = AtomRegister("ds")
+		self.register_list  = [self.code_segment, self.stack_segment, self.data_segment]
+		self.register_table = super(SegmentRegister, self).collect_sub_register()
 
-	def printSelf(self):
-		super(SegmentRegister, self).printSelf()
+	def print_self(self):
+		super(SegmentRegister, self).print_self()
 
 class IntegerRegister(RegisterBaseV):
 	def __init__(self):
-		self.Name = "INTEGER REGISTER"
+		self.name = "INTEGER REGISTER"
 		self.EAX = AtomRegister("eax")
 		self.ECX = AtomRegister("ecx")
 		self.EDX = AtomRegister("edx")
@@ -51,31 +51,31 @@ class IntegerRegister(RegisterBaseV):
 		self.EDI = AtomRegister("edi")
 		self.ESP = AtomRegister("esp")
 		self.EBP = AtomRegister("ebp")
-		self.RegisterList  = [self.EAX, self.ECX, self.EDX, self.EBX, self.ESI, self.EDI, self.ESP, self.EBP]
-		self.RegisterTable = super(IntegerRegister, self).collectSubRegister()
+		self.register_list  = [self.EAX, self.ECX, self.EDX, self.EBX, self.ESI, self.EDI, self.ESP, self.EBP]
+		self.register_table = super(IntegerRegister, self).collect_sub_register()
 
-	def printSelf(self):
-		super(IntegerRegister, self).printSelf()
+	def print_self(self):
+		super(IntegerRegister, self).print_self()
 
 class EFLAGS(RegisterBaseV):
 	def __init__(self):
-		self.Name = "EXTENDED FLAG REGISTER"
-		self.Zero   = AtomRegister("z")
-		self.Symbol = AtomRegister("o")
-		self.RegisterList  = [self.Zero, self.Symbol]
-		self.RegisterTable = super(EFLAGS, self).collectSubRegister()
+		self.name = "EXTENDED FLAG REGISTER"
+		self.zero_register   = AtomRegister("z")
+		self.symbol_register = AtomRegister("o")
+		self.register_list  = [self.zero_register, self.symbol_register]
+		self.register_table = super(EFLAGS, self).collect_sub_register()
 
-	def printSelf(self):
-		super(EFLAGS, self).printSelf()
+	def print_self(self):
+		super(EFLAGS, self).print_self()
 
 class SpecialRegister(RegisterBaseV):
 	def __init__(self):
-		self.Name = "SPECIAL REGISTER"
+		self.name = "SPECIAL REGISTER"
 		self.EIP = AtomRegister("eip")
-		self.FlagsReg = EFLAGS()
-		self.RegisterList  = [self.EIP] + self.FlagsReg.RegisterList
+		self.flags_register = EFLAGS()
+		self.register_list  = [self.EIP] + self.flags_register.register_list
 
-		self.RegisterTable = super(SpecialRegister, self).collectSubRegister()
+		self.register_table = super(SpecialRegister, self).collect_sub_register()
 
-	def printSelf(self):
-		super(SpecialRegister, self).printSelf()
+	def print_self(self):
+		super(SpecialRegister, self).print_self()
