@@ -96,7 +96,7 @@ R86Processor = R86()
 
 def p_statement_jump_label(p):
 	"statement : JUMP LABEL"
-	R86Processor.EIP = R86Processor.label_table[p[2][1:]]
+	R86Processor.set_reg(R86Processor.label_table[p[2][1:]], "eip")
 
 def p_statement_label(p):
 	"statement : LABEL COLON"

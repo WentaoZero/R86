@@ -10,8 +10,6 @@ class R86:
 
 		self.code_segment    = []
 		self.label_table     = {}
-		self.EIP = 0;
-		# TODO:
 
 		self.unary_operation_dict = {}
 		self.unary_operation_dict["incl"] = lambda x: x + 1
@@ -134,13 +132,16 @@ class R86:
 		self.set_reg(self.shift_operation_dict[_ins](self.get_reg(_reg), _num), _reg)
 
 	def print_register(self):
-		self.segment_register.print_self()
 		self.integer_register.print_self()
 		self.special_register.print_self()
+		self.segment_register.print_self()
 
 	def print_memory(self):
 		self.memory.print_self()
 
 	def print_self(self):
 		self.print_register()
+		print("LABEL TABLE")
+		print(self.label_table)
+		print()
 		self.print_memory()

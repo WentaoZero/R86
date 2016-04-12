@@ -60,8 +60,8 @@ class IntegerRegister(RegisterBaseV):
 class EFLAGS(RegisterBaseV):
 	def __init__(self):
 		self.name = "EXTENDED FLAG REGISTER"
-		self.zero_register   = AtomRegister("z")
-		self.symbol_register = AtomRegister("o")
+		self.zero_register   = AtomRegister("zf")
+		self.symbol_register = AtomRegister("of")
 		self.register_list  = [self.zero_register, self.symbol_register]
 		self.register_table = super(EFLAGS, self).collect_sub_register()
 
