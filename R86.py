@@ -54,11 +54,22 @@ class R86:
 		Jump = False
 		if _ins == "jmp":
 			Jump = True
-		elif _ins == "jge" and (self.get_reg("ZF") == 1 or self.get_reg("SF") == 0):
-			Jump = True
-		elif _ins in ["je", "jne", "js", "jns", "jg", "jl", "jle"]:
-			print("***\nTO BE IMPLEMENTED: {}\n***".format(_ins))
-			exit()
+		elif _ins == "jge":
+			Jump = self.get_reg("ZF") or (not self.get_reg("SF"))
+		elif _ins == "je":
+			Jump = self.get_reg("ZF")
+		elif _ins == "jne":
+			Jump = self.get_reg("ZF")
+		elif _ins == "js":
+			Jump = self.get_reg("SF")
+		elif _ins == "jns":
+			Jump = not self.get_reg("SF")
+		elif _ins == "jg":
+			Jump = (not self.get_reg("SF")) and (not self.get_reg("ZF"))
+		elif _ins == "jl":
+			Jump = self.get_reg("SF")
+		elif _ins == "jle":
+			Jump = self.get_reg("SF") or self.get_reg("ZF")
 		if Jump:
 			self.set_reg(self.label_table[_label[1:]], "eip")
 
@@ -67,6 +78,7 @@ class R86:
 			self.register_table[_reg].set_value(_value)
 		except LookupError:
 			print("***\nRegister not found: [" + _reg + "]\n***")
+			exit()
 
 	def set_reg_value_by_source(self, _ins, _source, _reg):
 		self.set_reg(self.binary_operation_dict[_ins](self.get_reg(_reg), _source), _reg)
@@ -76,6 +88,7 @@ class R86:
 	        return self.register_table[_reg].get_value()
 	    except LookupError:
 	    	print("***\nRegister not found: [" + _reg + "]\n***")
+	    	exit()
 
 	def init_memory(self, _min, _max):
 		self.memory.init(_min, _max)
