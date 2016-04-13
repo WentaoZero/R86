@@ -3,6 +3,7 @@ tokens = (
 	"DOLLAR",
 	"COLON",
 	"LABEL",
+	"COMPARE_OR_TEST",
 	"JUMP",
     "UNARY_ARITH",
     "BINARY_ARITH",
@@ -29,8 +30,12 @@ def t_LABEL(t):
 	r"\.[a-zA-Z]+[a-zA-Z0-9]*"
 	return t
 
+def t_COMPARE_OR_TEST(t):
+	r"(cmpl|testl)"
+	return t
+
 def t_JUMP(t):
-	r"jmp"
+	r"(jmp|jne|je|jge|jg|js|jns|jle|jl)"
 	return t
 
 def t_REGNAME(t):
@@ -94,9 +99,13 @@ def verifyScaleFactor(vScale):
 from R86 import R86
 R86Processor = R86()
 
+def p_statement_comparison_test(p):
+	"statement : COMPARE_OR_TEST source COMMA source"
+	R86Processor.set_condition_code(p[1], p[2], p[4])
+
 def p_statement_jump_label(p):
 	"statement : JUMP LABEL"
-	R86Processor.set_reg(R86Processor.label_table[p[2][1:]], "eip")
+	R86Processor.jump_to_label(p[1], p[2])
 
 def p_statement_label(p):
 	"statement : LABEL COLON"

@@ -23,6 +23,7 @@ class Memory:
 			return self.content[_address]
 		except LookupError:
 			print("Illegal access to memory: {}".format(_address))
+			exit()
 
 	def print_self(self):
 		print(self.name)

@@ -34,6 +34,34 @@ class R86:
 		self.register_table.update(self.integer_register.register_table)
 		self.register_table.update(self.special_register.register_table)
 
+	def set_condition_code(self, _ins, _first_source, _second_source):
+		self.set_reg(0, "ZF")
+		self.set_reg(0, "SF")
+		result = None
+		if _ins == "cmpl":
+			result = _second_source - _first_source
+		elif _ins == "testl":
+			result = _second_source & _first_source
+
+		assert(result != None)
+
+		if result == 0:
+			self.set_reg(1, "ZF")
+		elif result < 0:
+			self.set_reg(1, "SF")
+
+	def jump_to_label(self, _ins, _label):
+		Jump = False
+		if _ins == "jmp":
+			Jump = True
+		elif _ins == "jge" and (self.get_reg("ZF") == 1 or self.get_reg("SF") == 0):
+			Jump = True
+		elif _ins in ["je", "jne", "js", "jns", "jg", "jl", "jle"]:
+			print("***\nTO BE IMPLEMENTED: {}\n***".format(_ins))
+			exit()
+		if Jump:
+			self.set_reg(self.label_table[_label[1:]], "eip")
+
 	def set_reg(self, _value, _reg):
 		try:
 			self.register_table[_reg].set_value(_value)
