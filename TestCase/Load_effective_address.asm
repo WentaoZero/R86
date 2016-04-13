@@ -3,9 +3,9 @@
 	movl %ebp, %esp
 	;set %ebp, %esp to 16
 	movl $-3, %eax
-	;set %eax to -3
+	;set %eax
 	movl $7, %ecx
-	;set %ecx to 7
+	;set %ecx
 
 ;LoadEffectiveAddress:
 	pushl %ebp

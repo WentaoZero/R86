@@ -4,6 +4,9 @@
 	;set %ebp, %esp to 16
 
 ;jump:
+	pushl %ebp
+	movl %esp, %ebp
+
 	movl $0, %eax
 	jmp .L1
 	movl -1, %edx

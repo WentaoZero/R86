@@ -3,11 +3,11 @@
 	movl %ebp, %esp
 	;set %ebp, %esp to 16
 	movl $7, 4(%ebp)
-	;set x to 11
+	;set x
 	movl $19, 8(%ebp)
-	;set y to 14
+	;set y
 	movl $37, 12(%ebp)
-	;set z to 17
+	;set z
 
 ;Arith:
 	pushl %ebp

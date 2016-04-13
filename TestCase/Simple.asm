@@ -3,14 +3,14 @@
 	movl %ebp, %esp
 	;set %ebp, %esp to 16
 	movl $36, %eax
-	;set xp to 36
+	;set xp
 	movl $-3, (%eax)
 	movl %eax, 4(%ebp)
-	;set *xp to -3
+	;set *xp
 	movl %ebp, (%ebp)
 	;store %ebp
 	movl $20, 8(%ebp)
-	;set y to 20
+	;set y
 
 ;Simple:
 	pushl %ebp

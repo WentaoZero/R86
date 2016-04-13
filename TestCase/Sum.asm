@@ -3,9 +3,9 @@
 	movl %ebp, %esp
 	;set %ebp, %esp to 16
 	movl $19, 4(%ebp)
-	;set x to 19
+	;set x
 	movl $23, 8(%ebp)
-	;set y to 23
+	;set y
 
 ;Sum:
 	pushl %ebp

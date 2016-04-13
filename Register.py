@@ -13,7 +13,7 @@ class AtomRegister:
 		return self.value
 
 	def print_self(self):
-		print("%" + self.name + " = " + str(self.value))
+		print(self.name + " = " + str(self.value))
 
 class RegisterBaseV(object):
 	def collect_sub_register(self):
@@ -60,8 +60,8 @@ class IntegerRegister(RegisterBaseV):
 class EFLAGS(RegisterBaseV):
 	def __init__(self):
 		self.name = "EXTENDED FLAG REGISTER"
-		self.zero_register   = AtomRegister("zf")
-		self.symbol_register = AtomRegister("of")
+		self.zero_register   = AtomRegister("ZF")
+		self.symbol_register = AtomRegister("OF")
 		self.register_list  = [self.zero_register, self.symbol_register]
 		self.register_table = super(EFLAGS, self).collect_sub_register()
 
