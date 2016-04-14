@@ -13,9 +13,11 @@
 	movl $1, %eax
 	cmpl $1, %edx
 	jle .L7
+
 .L10:
 	imull %edx, %eax
 	subl $1, %edx
 	cmpl $1, %edx
 	jg .L10
+
 .L7:

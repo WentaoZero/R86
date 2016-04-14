@@ -1,4 +1,3 @@
-;>python3 Simulator.py TestCase/Unary_and_binary_operations.asm 250 300
 ;prepare
 	movl $300, %ebp
 	movl %ebp, %esp

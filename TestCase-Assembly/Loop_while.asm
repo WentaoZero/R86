@@ -19,10 +19,12 @@
 	leal (%ebx, %ecx), %edx
 	movl $1, %eax
 	;this statement seems redundant
+
 .L12:
 	imull %edx, %eax
 	addl $1, %ecx
 	addl $1, %edx
 	cmpl %ecx, %ebx
 	jg .L12
+
 .L11:

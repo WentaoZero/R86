@@ -7,6 +7,7 @@ tokens = (
 	"JUMP",
     "UNARY_ARITH",
     "BINARY_ARITH",
+    "MOVE",
     "SHIFT",
     "LEAL",
 	"PUSH",
@@ -46,8 +47,12 @@ def t_UNARY_ARITH(t):
 	r"(incl|decl|negl|notl)"
 	return t
 
+def t_MOVE(t):
+	r"movl"
+	return t
+
 def t_BINARY_ARITH(t):
-	r"(movl|addl|subl|imull|xorl|orl|andl)"
+	r"(addl|subl|imull|xorl|orl|andl)"
 	return t
 
 def t_SHIFT(t):
@@ -244,6 +249,7 @@ def p_source_register(p):
     except LookupError:
         print("Unknown register '%s'" % p[1])
         p[0] = 0
+        exit()
 
 def p_source_memory_direct(p):
 	"source : memory_as_source"
@@ -276,9 +282,6 @@ def p_memory_as_source_number_double_register(p):
 def p_register(p):
 	"register : PERCENTAGE REGNAME"
 	p[0] = p[2]
-
-def p_expression_source(p):
-	"statement : source"
 
 def p_error(p):
     print("Syntax error at '%s'" % p.value)

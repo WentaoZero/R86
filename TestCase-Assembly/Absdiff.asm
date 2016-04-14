@@ -17,7 +17,9 @@
 	jge .L2
 	subl %edx, %eax
 	jmp .L3
+
 .L2:
 	subl %eax, %edx
 	movl %edx, %eax
+
 .L3:

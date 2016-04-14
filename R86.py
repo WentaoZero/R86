@@ -91,6 +91,9 @@ class R86:
 	def set_memory(self, _value, _address):
 		self.memory.set(_value, _address)
 
+	def get_memory(self, _address):
+		return self.memory.get(_address)
+
 	def unary_oeprate_source_reg(self, _unary_ins, _reg):
 		self.set_reg(self.unary_operation_dict[_unary_ins](self.get_reg(_reg)), _reg)
 
@@ -145,9 +148,6 @@ class R86:
 	def binary_operate_source_reg_reg_scale(self, _binary_ins, _source, _first_source_reg, _second_source_reg, _scale_factor):
 		address = self.get_reg(_first_source_reg) + self.get_reg(_second_source_reg) * _scale_factor
 		self.set_memory(self.binary_operation_dict[_binary_ins](self.get_memory(address), _source), address)
-
-	def get_memory(self, _address):
-		return self.memory.get(_address)
 
 	def lea_num_reg(self, _num, _source_reg, _dest_reg):
 		self.set_reg(self.get_reg(_source_reg)+_num,_dest_reg)

@@ -11,5 +11,6 @@
 	jmp .L1
 	movl -1, %edx
 	;illegal access to memory
+
 .L1:
 	popl %edx
