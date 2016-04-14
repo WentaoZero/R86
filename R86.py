@@ -34,21 +34,16 @@ class R86:
 		self.register_table.update(self.integer_register.register_table)
 		self.register_table.update(self.special_register.register_table)
 
-	def set_condition_code(self, _ins, _first_source, _second_source):
-		self.set_reg(0, "ZF")
-		self.set_reg(0, "SF")
-		result = None
-		if _ins == "cmpl":
-			result = _second_source - _first_source
-		elif _ins == "testl":
-			result = _second_source & _first_source
-
-		assert(result != None)
-
-		if result == 0:
+	def set_condition_code(self, _result):
+		if _result == 0:
 			self.set_reg(1, "ZF")
-		elif result < 0:
+			self.set_reg(0, "SF")
+		elif _result < 0:
+			self.set_reg(0, "ZF")
 			self.set_reg(1, "SF")
+		else: # result > 0
+			self.set_reg(0, "ZF")
+			self.set_reg(0, "SF")
 
 	def jump_to_label(self, _ins, _label):
 		Jump = False

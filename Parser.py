@@ -101,7 +101,14 @@ R86Processor = R86()
 
 def p_statement_comparison_test(p):
 	"statement : COMPARE_OR_TEST source COMMA source"
-	R86Processor.set_condition_code(p[1], p[2], p[4])
+	result = None
+	if p[1] == "cmpl":
+		result = p[4] - p[2]
+	if p[1] == "testl":
+		result = p[4] & p[2]
+
+	assert(result != None)
+	R86Processor.set_condition_code(result)
 
 def p_statement_jump_label(p):
 	"statement : JUMP LABEL"
@@ -181,9 +188,13 @@ def p_statement_binary_arith_memory_number(p):
     "statement : BINARY_ARITH source COMMA NUMBER"
     R86Processor.binary_operate_source_num(p[1], p[2], p[4])
 
-def p_statement_shift(p):
+def p_statement_shift_num_reg(p):
 	"statement : SHIFT DOLLAR NUMBER COMMA register"
 	R86Processor.shift_operate(p[1], p[3], p[5])
+
+def p_statement_shift_reg(p):
+	"statement : SHIFT register"
+	R86Processor.shift_operate(p[1], 1, p[2])
 
 def p_statement_leal_number_register(p):
 	"statement : LEAL NUMBER LPAREN register RPAREN COMMA register"
