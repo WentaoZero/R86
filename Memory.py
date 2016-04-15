@@ -3,26 +3,26 @@ class Memory:
 		self.name = "MEMORY"
 		self.content = {}
 
-	def init(self, _min, _max):
-		self.address_min = _min
-		self.address_max = _max
+	def init(self, min, max):
+		self.address_min = min
+		self.address_max = max
 
 		for i in range(int(self.address_min/4), int(self.address_max/4)+1):
 			self.content[i*4] = 0
 
-	def set(self, _val, _address):
-		if _address > self.address_max or _address < self.address_min or _address%4 != 0:
-			print("Illegal access to memory: {}".format(_address))
+	def set(self, val, address):
+		if address > self.address_max or address < self.address_min or address%4 != 0:
+			print("Illegal access to memory: {}".format(address))
 			exit()
-		self.content[_address] = _val
-		if _address > self.address_max:
-			self.address_max = _address
+		self.content[address] = val
+		if address > self.address_max:
+			self.address_max = address
 
-	def get(self, _address):
+	def get(self, address):
 		try:
-			return self.content[_address]
+			return self.content[address]
 		except LookupError:
-			print("Illegal access to memory: {}".format(_address))
+			print("Illegal access to memory: {}".format(address))
 			exit()
 
 	def print_self(self):

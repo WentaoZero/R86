@@ -1,13 +1,13 @@
 class AtomRegister:
-	def __init__(self, _name):
-		self.name  = _name
+	def __init__(self, name):
+		self.name  = name
 		self.value = 0
 
 	def get_name(self):
 		return self.name
 
-	def set_value(self, _value):
-		self.value = _value
+	def set_value(self, value):
+		self.value = value
 
 	def get_value(self):
 		return self.value

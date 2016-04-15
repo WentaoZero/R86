@@ -2,13 +2,13 @@ from Parser import yacc
 from Parser import R86Processor
 
 class Simulator:
-	def init_memory(self, _min, _max):
-		R86Processor.init_memory(_min, _max)
+	def init_memory(self, min, max):
+		R86Processor.init_memory(min, max)
 
-	def readFile(self, _file_name):
-		with open(_file_name) as input_file:
-			for _line in input_file:
-				cleaned_line = _line.strip("\n\t")
+	def readFile(self, file_name):
+		with open(file_name) as input_file:
+			for line in input_file:
+				cleaned_line = line.strip("\n\t")
 				if (0 != len(cleaned_line) and cleaned_line[0] != ";"):
 					if is_label(cleaned_line):
 						R86Processor.label_table[get_label(cleaned_line)] = len(R86Processor.code_segment)
@@ -27,32 +27,32 @@ class Simulator:
 
 import re
 
-def is_label(_line):
-	_line = drop_comment(drop__space_and_tab(_line))
-	matchObj = re.match(r"\.(.*):", _line)
+def is_label(line):
+	line = drop_comment(drop__space_and_tab(line))
+	matchObj = re.match(r"\.(.*):", line)
 	if matchObj:
 		return True
 	else:
 		return False
 
-def get_label(_line):
-	_line = drop_comment(drop__space_and_tab(_line))
-	matchObj = re.match(r"\.(.*):", _line)
+def get_label(line):
+	line = drop_comment(drop__space_and_tab(line))
+	matchObj = re.match(r"\.(.*):", line)
 	return matchObj.group(1)
 
-def drop__space_and_tab(_line):
+def drop__space_and_tab(line):
 	new_line = str()
-	for item in _line:
+	for item in line:
 		if item not in [" ", "\t"]:
 			new_line += item
 	return new_line
 
-def drop_comment(_line):
-	num = _line.find(";")
+def drop_comment(line):
+	num = line.find(";")
 	if num != -1:
-		return _line[:num]
+		return line[:num]
 	else:
-		return _line
+		return line
 
 if __name__ == "__main__":
 
@@ -74,5 +74,3 @@ if __name__ == "__main__":
 	#print(R86Processor.label_table)
 
 	R86Processor.print_self()
-
-	print
