@@ -5,10 +5,9 @@ tokens = (
 	"LABEL",
 	"COMPARE_OR_TEST",
 	"JUMP",
-#    "UNARY_ARITH",
-    "BINARY_ARITH",
+	"UNARY_ARITH",
+	"BINARY_ARITH",
 	"MOVE",
-#    "SHIFT",
 #    "LEAL",
 	"PUSH",
 	"POP",
@@ -42,23 +41,20 @@ def t_JUMP(t):
 def t_REGNAME(t):
 	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
 	return t
-'''
+
 def t_UNARY_ARITH(t):
 	r"(incl|decl|negl|notl)"
 	return t
-'''
+
 def t_BINARY_ARITH(t):
-	r"(addl|subl|imull|xorl|orl|andl)"
+	r"(addl|subl|imull|xorl|orl|andl|sarl|sall)"
 	return t
 
 def t_MOVE(t):
 	r"movl"
 	return t
-'''
-def t_SHIFT(t):
-	r"(sarl|sall)"
-	return t
 
+'''
 def t_LEAL(t):
 	r"leal"
 	return t
@@ -97,11 +93,6 @@ def t_error(t):
 import ply.lex as lex
 lex.lex()
 
-def verifyScaleFactor(scale):
-	if scale not in [1, 2, 4, 8]:
-		print("Illegal scale factor: {}".format(scale))
-		exit()
-
 from R86 import R86
 R86Processor = R86()
 
@@ -124,15 +115,19 @@ def p_statement_label(p):
 	"statement : LABEL COLON"
 	#do nothing
 
+def p_satement_unary_arith(p):
+	"statement : UNARY_ARITH destination"
+	dest_value = R86Processor.get(p[2])
+	R86Processor.set(R86Processor.unary_operate[p[1]](dest_value), p[2])
+
 def p_statement_move(p):
 	"statement : MOVE source COMMA destination"
 	R86Processor.set(p[2], p[4])
 
 def p_statement_binary_arith(p):
 	"statement : BINARY_ARITH source COMMA destination"
-	source_value = p[2]
 	dest_value   = R86Processor.get(p[4])
-	result       = R86Processor.binary_operate[p[1]](dest_value, source_value)
+	result       = R86Processor.binary_operate[p[1]](dest_value, p[2])
 	R86Processor.set(result, p[4])
 
 def p_source_immediate_number(p):
@@ -141,12 +136,12 @@ def p_source_immediate_number(p):
 
 def p_source_register_memory(p):
 	"""source : register
-	          | memory"""
+			  | memory"""
 	p[0] = R86Processor.get(p[1])
 
 def p_destination_register_memory(p):
 	"""destination : register
-	               | memory"""
+				   | memory"""
 	p[0] = p[1]
 
 def p_memory_direct_addressing(p):

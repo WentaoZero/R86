@@ -11,11 +11,11 @@ class R86:
 		self.code_segment    = []
 		self.label_table     = {}
 
-		self.unary_operation_dict = {}
-		self.unary_operation_dict["incl"] = lambda x: x + 1
-		self.unary_operation_dict["decl"] = lambda x: x - 1
-		self.unary_operation_dict["negl"] = lambda x: -x
-		self.unary_operation_dict["notl"] = lambda x: ~x
+		self.unary_operate = {}
+		self.unary_operate["incl"] = lambda x: x + 1
+		self.unary_operate["decl"] = lambda x: x - 1
+		self.unary_operate["negl"] = lambda x: -x
+		self.unary_operate["notl"] = lambda x: ~x
 
 		self.binary_operate = {}
 		self.binary_operate["addl"]  = lambda x, y: x + y
@@ -24,10 +24,9 @@ class R86:
 		self.binary_operate["orl"]  = lambda x, y: x | y
 		self.binary_operate["andl"] = lambda x, y: x & y
 		self.binary_operate["xorl"] = lambda x, y: x ^ y
-
-		self.shift_operation_dict = {}
-		self.shift_operation_dict["sarl"] = lambda x, y: x >> y
-		self.shift_operation_dict["sall"] = lambda x, y: x << y
+#		self.shift_operation_dict = {}
+		self.binary_operate["sarl"] = lambda x, y: x >> y
+		self.binary_operate["sall"] = lambda x, y: x << y
 
 		self.register_table = self.segment_register.register_table.copy()
 		self.register_table.update(self.integer_register.register_table)
@@ -106,43 +105,43 @@ class R86:
 		return self.memory.get(_address)
 
 	def unary_oeprate_source_reg(self, unaryins, reg):
-		self.set_reg(self.unary_operation_dict[unaryins](self.get_reg(reg)), reg)
+		self.set_reg(self.unary_operate[unaryins](self.get_reg(reg)), reg)
 
 	def unary_operate_memory_num(self, unaryins, num):
 		address = num
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_reg(self, unaryins, reg):
 		address = self.get_reg(reg)
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_num_reg(self, unaryins, num, reg):
 		address = num + self.get_reg(reg)
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_reg_reg(self, unaryins, first_reg, second_reg):
 		address = self.get_reg(first_reg) + self.get_reg(second_reg)
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_num_reg_reg(self, unaryins, num, first_reg, second_reg):
 		address = num + self.get_reg(first_reg) + self.get_reg(second_reg)
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_reg_scale(self, unaryins, reg, _scale_factor):
 		address = self.get_reg(reg) * _scale_factor
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_num_reg_scale(self, unaryins, num, reg, _scale_factor):
 		address = self.get_reg(reg) * _scale_factor + num
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_reg_reg_scale(self, unaryins, first_reg, second_reg, _scale_factor):
 		address = self.get_reg(first_reg) + self.get_reg(second_reg) * _scale_factor
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def unary_operate_memory_num_reg_reg_scale(self, unaryins, num, first_reg, second_reg, _scale_factor):
 		address = num + self.get_reg(first_reg) + self.get_reg(second_reg) * _scale_factor
-		self.set_memory(self.unary_operation_dict[unaryins](self.get_memory(address)), address)
+		self.set_memory(self.unary_operate[unaryins](self.get_memory(address)), address)
 
 	def lea_num_reg(self, num, _source_reg, dest_reg):
 		self.set_reg(self.get_reg(_source_reg)+num,dest_reg)
