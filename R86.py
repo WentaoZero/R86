@@ -1,5 +1,5 @@
 from Register import SegmentRegister, IntegerRegister, SpecialRegister
-from Memory  import Memory
+from Memory   import Memory
 
 class R86:
 	def __init__(self):
@@ -33,30 +33,22 @@ class R86:
 		self.register_table.update(self.special_register.register_table)
 
 	def unary_operate(self, ins, dest):
-		self.set(self.unary_operation_dict[ins](self.get(dest)), dest)
+		result = self.unary_operation_dict[ins](self.get(dest))
+		self.set(result, dest)
+		self.set_condition_code(result)
 
 	def binary_operate(self, ins, source, dest):
-		self.set(self.binary_operation_dict[ins](self.get(dest), source), dest)
-
-	def set_condition_code(self, result):
-		if result == 0:
-			self.set_reg(1, "ZF")
-			self.set_reg(0, "SF")
-		elif result < 0:
-			self.set_reg(0, "ZF")
-			self.set_reg(1, "SF")
-		else: #result > 0
-			self.set_reg(0, "ZF")
-			self.set_reg(0, "SF")
+		result = self.binary_operation_dict[ins](self.get(dest), source)
+		self.set(result, dest)
+		self.set_condition_code(result)
 
 	def compare_or_test(self, ins, second_source, first_source):
-		result = None
 		if ins == "cmpl":
 			result = first_source - second_source
 		elif ins == "testl":
 			result = first_source & second_source
 		else:
-			print("Instruction unidentified: " + ins)
+			print("***\nInstruction unidentified: [" + ins + "]\n***")
 			exit()
 		self.set_condition_code(result)
 
@@ -82,6 +74,17 @@ class R86:
 			Jump = self.get_reg("SF") or self.get_reg("ZF")
 		if Jump:
 			self.set_reg(self.label_table[label[1:]], "eip")
+
+	def set_condition_code(self, result):
+		if result == 0:
+			self.set_reg(1, "ZF")
+			self.set_reg(0, "SF")
+		elif result < 0:
+			self.set_reg(0, "ZF")
+			self.set_reg(1, "SF")
+		else: #result > 0
+			self.set_reg(0, "ZF")
+			self.set_reg(0, "SF")
 
 	def set(self, source_value, dest):
 		if dest in ["eax","ecx","edx","ebx","esi","edi","esp","ebp"]:
