@@ -8,7 +8,7 @@ tokens = (
 	"UNARY_ARITH",
 	"BINARY_ARITH",
 	"MOVE",
-	"LEAL",
+	"LEA",
 	"PUSH",
 	"POP",
 	"COMMA",
@@ -54,7 +54,7 @@ def t_MOVE(t):
 	r"movl"
 	return t
 
-def t_LEAL(t):
+def t_LEA(t):
 	r"leal"
 	return t
 
@@ -115,8 +115,7 @@ def p_statement_label(p):
 
 def p_satement_unary_arith(p):
 	"statement : UNARY_ARITH destination"
-	dest_value = R86Processor.get(p[2])
-	R86Processor.set(R86Processor.unary_operate[p[1]](dest_value), p[2])
+	R86Processor.unary_operate(p[1], p[2])
 
 def p_statement_move(p):
 	"statement : MOVE source COMMA destination"
@@ -124,11 +123,10 @@ def p_statement_move(p):
 
 def p_statement_binary_arith(p):
 	"statement : BINARY_ARITH source COMMA destination"
-	dest_value   = R86Processor.get(p[4])
-	R86Processor.set(R86Processor.binary_operate[p[1]](dest_value, p[2]), p[4])
+	R86Processor.binary_operate(p[1], p[2], p[4])
 
 def p_statement_load_effect_address(p):
-	"statement : LEAL effect_address COMMA destination"
+	"statement : LEA effect_address COMMA register"
 	R86Processor.set(p[2], p[4])
 
 def p_source_immediate_number(p):
