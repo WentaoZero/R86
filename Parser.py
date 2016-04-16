@@ -8,7 +8,7 @@ tokens = (
 	"UNARY_ARITH",
 	"BINARY_ARITH",
 	"MOVE",
-#    "LEAL",
+	"LEAL",
 	"PUSH",
 	"POP",
 	"COMMA",
@@ -54,11 +54,9 @@ def t_MOVE(t):
 	r"movl"
 	return t
 
-'''
 def t_LEAL(t):
 	r"leal"
 	return t
-'''
 
 def t_PUSH(t):
 	r"pushl"
@@ -127,8 +125,11 @@ def p_statement_move(p):
 def p_statement_binary_arith(p):
 	"statement : BINARY_ARITH source COMMA destination"
 	dest_value   = R86Processor.get(p[4])
-	result       = R86Processor.binary_operate[p[1]](dest_value, p[2])
-	R86Processor.set(result, p[4])
+	R86Processor.set(R86Processor.binary_operate[p[1]](dest_value, p[2]), p[4])
+
+def p_statement_load_effect_address(p):
+	"statement : LEAL effect_address COMMA destination"
+	R86Processor.set(p[2], p[4])
 
 def p_source_immediate_number(p):
 	"source : DOLLAR NUMBER"
@@ -163,6 +164,26 @@ def p_memory_double_register(p):
 def p_memory_number_double_register(p):
 	"memory : NUMBER LPAREN register COMMA register RPAREN"
 	p[0] = p[1] + R86Processor.get(p[3]) + R86Processor.get(p[5])
+
+def p_effect_address_num_reg(p):
+	"effect_address : NUMBER LPAREN register RPAREN"
+	p[0] = p[1] + R86Processor.get(p[3])
+
+def p_effect_address_reg_reg(p):
+	"effect_address : LPAREN register COMMA register RPAREN"
+	p[0] = R86Processor.get(p[2]) + R86Processor.get(p[4])
+
+def p_effect_address_reg_reg_num(p):
+	"effect_address : LPAREN register COMMA register COMMA NUMBER RPAREN"
+	p[0] = R86Processor.get(p[2]) + R86Processor.get(p[4]) * p[6]
+
+def p_effect_address_num_reg_reg_num(p):
+	"effect_address : NUMBER LPAREN register COMMA register COMMA NUMBER RPAREN"
+	p[0] = p[1] + R86Processor.get(p[3]) + R86Processor.get(p[5]) * p[7]
+
+def p_effect_address_num_reg_num(p):
+	"effect_address : NUMBER LPAREN COMMA register COMMA NUMBER RPAREN"
+	p[0] = p[1] + R86Processor.get(p[4]) * p[6]
 
 def p_number(p):
 	"""NUMBER : DECNUM
