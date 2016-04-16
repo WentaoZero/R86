@@ -2,7 +2,7 @@
 	movl $16, %ebp
 	movl %ebp, %esp
 	;set %ebp, %esp to 16
-	movl $4, 4(%ebp)
+	movl $7, 4(%ebp)
 	;set x
 
 ;fun_a:
