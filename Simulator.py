@@ -71,6 +71,4 @@ if __name__ == "__main__":
 	MySim.readFile(args.asm)
 	MySim.startSimulation()
 
-	#print(R86Processor.label_table)
-
 	R86Processor.print_self()

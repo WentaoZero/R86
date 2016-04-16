@@ -16,6 +16,7 @@ class R86:
 		self.unary_operation_dict["decl"] = lambda x: x - 1
 		self.unary_operation_dict["negl"] = lambda x: -x
 		self.unary_operation_dict["notl"] = lambda x: ~x
+		self.unary_operation_dict["sarl"] = lambda x: x >> 1
 
 		self.binary_operation_dict = {}
 		self.binary_operation_dict["addl"]  = lambda x, y: x + y
@@ -61,7 +62,7 @@ class R86:
 		elif ins == "je":
 			Jump = self.get_reg("ZF")
 		elif ins == "jne":
-			Jump = self.get_reg("ZF")
+			Jump = not self.get_reg("ZF")
 		elif ins == "js":
 			Jump = self.get_reg("SF")
 		elif ins == "jns":

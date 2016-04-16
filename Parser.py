@@ -43,11 +43,11 @@ def t_REGNAME(t):
 	return t
 
 def t_UNARY_ARITH(t):
-	r"(incl|decl|negl|notl)"
+	r"(incl|decl|negl|notl|sarl)"
 	return t
 
 def t_BINARY_ARITH(t):
-	r"(addl|subl|imull|xorl|orl|andl|sarl|sall)"
+	r"(addl|subl|imull|xorl|orl|andl)"
 	return t
 
 def t_MOVE(t):
