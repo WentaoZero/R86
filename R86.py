@@ -49,6 +49,17 @@ class R86:
 			self.set_reg(0, "ZF")
 			self.set_reg(0, "SF")
 
+	def compare_or_test(self, ins, second_source, first_source):
+		result = None
+		if ins == "cmpl":
+			result = first_source - second_source
+		elif ins == "testl":
+			result = first_source & second_source
+		else:
+			print("Instruction unidentified: " + ins)
+			exit()
+		self.set_condition_code(result)
+
 	def jump_to_label(self, ins, label):
 		Jump = False
 		if ins == "jmp":

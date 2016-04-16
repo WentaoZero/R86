@@ -3,7 +3,7 @@ tokens = (
 	"DOLLAR",
 	"COLON",
 	"LABEL",
-	"COMPARE_OR_TEST",
+	"COMPARE_or_TEST",
 	"JUMP",
 	"UNARY_ARITH",
 	"BINARY_ARITH",
@@ -30,7 +30,7 @@ def t_LABEL(t):
 	r"\.[a-zA-Z]+[a-zA-Z0-9]*"
 	return t
 
-def t_COMPARE_OR_TEST(t):
+def t_COMPARE_or_TEST(t):
 	r"(cmpl|testl)"
 	return t
 
@@ -95,15 +95,8 @@ from R86 import R86
 R86Processor = R86()
 
 def p_statement_comparison_test(p):
-	"statement : COMPARE_OR_TEST source COMMA source"
-	result = None
-	if p[1] == "cmpl":
-		result = p[4] - p[2]
-	if p[1] == "testl":
-		result = p[4] & p[2]
-
-	assert(result != None)
-	R86Processor.set_condition_code(result)
+	"statement : COMPARE_or_TEST source COMMA source"
+	R86Processor.compare_or_test(p[1], p[2], p[4])
 
 def p_statement_jump_label(p):
 	"statement : JUMP LABEL"
