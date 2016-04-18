@@ -81,13 +81,13 @@ class R86:
 			self.set_reg(0, "SF")
 
 	def set(self, source_value, dest):
-		if dest in ["eax","ecx","edx","ebx","esi","edi","esp","ebp"]:
+		if dest in self.integer_register.name_list:
 			self.set_reg(source_value, dest)
 		else:
 			self.set_memory(source_value, dest)
 
 	def get(self, dest):
-		if dest in ["eax","ecx","edx","ebx","esi","edi","esp","ebp"]:
+		if dest in self.integer_register.name_list:
 			return self.get_reg(dest)
 		else:
 			return self.get_memory(dest)

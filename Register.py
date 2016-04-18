@@ -52,6 +52,8 @@ class IntegerRegister(RegisterBaseV):
 		self.ESP = AtomRegister("esp")
 		self.EBP = AtomRegister("ebp")
 		self.register_list  = [self.EAX, self.ECX, self.EDX, self.EBX, self.ESI, self.EDI, self.ESP, self.EBP]
+		self.name_list = [_name for _name in map(lambda reg: reg.name, self.register_list)]
+
 		self.register_table = super(IntegerRegister, self).collect_sub_register()
 
 	def print_self(self):
