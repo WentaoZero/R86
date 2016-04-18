@@ -54,26 +54,19 @@ class R86:
 		self.set_condition_code(result)
 
 	def jump_to_label(self, ins, label):
-		Jump = False
-		if ins == "jmp":
-			Jump = True
-		elif ins == "jge":
-			Jump = self.get_reg("ZF") or (not self.get_reg("SF"))
-		elif ins == "je":
-			Jump = self.get_reg("ZF")
-		elif ins == "jne":
-			Jump = not self.get_reg("ZF")
-		elif ins == "js":
-			Jump = self.get_reg("SF")
-		elif ins == "jns":
-			Jump = not self.get_reg("SF")
-		elif ins == "jg":
-			Jump = (not self.get_reg("SF")) and (not self.get_reg("ZF"))
-		elif ins == "jl":
-			Jump = self.get_reg("SF")
-		elif ins == "jle":
-			Jump = self.get_reg("SF") or self.get_reg("ZF")
-		if Jump:
+		should_jump = {
+			"jmp": True,
+			"je" : self.get_reg("ZF"),
+			"jne": not self.get_reg("ZF"),
+			"jl" : self.get_reg("SF"),
+			"jle": self.get_reg("SF") or self.get_reg("ZF"),
+			"jg" : not (self.get_reg("SF") or self.get_reg("ZF")),
+			"jge": not self.get_reg("SF"),
+			"js" : self.get_reg("SF"),
+			"jns": not self.get_reg("SF")
+		}[ins]
+
+		if should_jump:
 			self.set_reg(self.label_table[label[1:]], "eip")
 
 	def set_condition_code(self, result):
