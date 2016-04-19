@@ -8,8 +8,8 @@ class R86:
 		self.special_register = SpecialRegister()
 		self.memory = Memory()
 
-		self.code_segment    = []
-		self.label_table     = {}
+		self.code_segment = []
+		self.label_table  = {}
 
 		self.unary_operation_dict = {}
 		self.unary_operation_dict["incl"] = lambda x: x + 1
@@ -44,17 +44,13 @@ class R86:
 		self.set(result, dest)
 		self.set_condition_code(result)
 
-	def compare_or_test(self, ins, second_source, first_source):
-		if ins == "cmpl":
-			result = first_source - second_source
-		elif ins == "testl":
-			result = first_source & second_source
-		else:
-			print("***\nInstruction unidentified: [" + ins + "]\n***")
-			exit()
-		self.set_condition_code(result)
+	def compare(self, ins, second_source, first_source):
+		self.set_condition_code(first_source - second_source)
 
-	def jump_to_label(self, ins, label):
+	def test(self, ins, second_source, first_source):
+		self.set_condition_code(first_source & second_source)
+
+	def conditional_jump(self, ins, label):
 		should_jump = {
 			"jmp": True,
 			"je" : self.get_reg("ZF"),

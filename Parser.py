@@ -1,23 +1,30 @@
 tokens = (
-	"REGNAME",
-	"DOLLAR",
-	"COLON",
-	"LABEL",
-	"COMPARE_or_TEST",
-	"JUMP",
-	"UNARY_ARITH",
-	"BINARY_ARITH",
-	"SHIFT",
-	"MOVE",
-	"LEA",
-	"PUSH",
-	"POP",
-	"COMMA",
-	"PERCENTAGE",
-	"LPAREN",
-	"RPAREN",
-	"DECNUM",
-	"HEXNUM"
+		"DOLLAR",
+		"PERCENTAGE",
+		"COMMA",
+		"LPAREN",
+		"RPAREN",
+		"COLON",
+		"ASTERISK",
+		"DOT_LONG"
+	) + (
+		"HEXNUM",
+		"DECNUM"
+	) + (
+		"REGNAME",
+		"LABEL"
+	) + (
+		"PUSH",
+		"POP",
+		"MOVE",
+		"UNARY_ARITH",
+		"BINARY_ARITH",
+		"COMPARE",
+		"TEST",
+		"JUMP",
+		"CONDITIONAL_JUMP",
+		"SHIFT",
+		"LEA"
 	)
 
 t_DOLLAR     = r"\$"
@@ -26,71 +33,80 @@ t_COMMA  = r"\,"
 t_LPAREN = r"\("
 t_RPAREN = r"\)"
 t_COLON = r"\:"
+t_ASTERISK = r"\*"
 
-def t_LABEL(t):
-	r"\.[a-zA-Z]+[a-zA-Z0-9]*"
-	return t
-
-def t_COMPARE_or_TEST(t):
-	r"(cmpl|testl)"
-	return t
-
-def t_JUMP(t):
-	r"(jmp|jne|je|jge|jg|js|jns|jle|jl)"
-	return t
-
-def t_REGNAME(t):
-	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
-	return t
-
-def t_BINARY_ARITH(t):
-	r"(addl|subl|imull|xorl|orl|andl)"
-	return t
-
-def t_UNARY_ARITH(t):
-	r"(incl|decl|negl|notl)"
-	return t
-
-def t_SHIFT(t):
-	r"(sall|sarl)"
-	return t
-
-def t_MOVE(t):
-	r"movl"
-	return t
-
-def t_LEA(t):
-	r"leal"
-	return t
-
-def t_PUSH(t):
-	r"pushl"
-	return t
-
-def t_POP(t):
-	r"popl"
+def t_DOT_LONG(t):
+	r"\.long\b"
 	return t
 
 def t_HEXNUM(t):
-	r"-?0x[0-9a-fA-F]+"
+	r"\b(-?0x[0-9a-fA-F]+)\b"
 	t.value = int(t.value, 16)
 	return t
 
 def t_DECNUM(t):
-	r"-?[0-9]+"
+	r"\b(-?[0-9]+)\b"
 	t.value = int(t.value, 10)
+	return t
+
+def t_REGNAME(t):
+	r"\b(eax|ecx|edx|ebx|esi|edi|esp|ebp)\b"
+	return t
+
+def t_LABEL(t):
+	r"\.[a-zA-Z]+[a-zA-Z0-9]*\b"
+	return t
+
+def t_PUSH(t):
+	r"\b(pushl)\b"
+	return t
+
+def t_POP(t):
+	r"\b(popl)\b"
+	return t
+
+def t_MOVE(t):
+	r"\b(movl)\b"
+	return t
+
+def t_UNARY_ARITH(t):
+	r"\b(incl|decl|negl|notl)\b"
+	return t
+
+def t_BINARY_ARITH(t):
+	r"\b(addl|subl|imull|xorl|orl|andl)\b"
+	return t
+
+def t_COMPARE(t):
+	r"\b(cmpl)\b"
+	return t
+
+def t_TEST(t):
+	r"\b(testl)\b"
+	return t
+
+def t_JUMP(t):
+	r"\b(jmp)\b"
+	return t
+
+def t_CONDITIONAL_JUMP(t):
+	r"\b(jne|je|jge|jg|js|jns|jle|jl)\b"
+	return t
+
+def t_SHIFT(t):
+	r"\b(sall|sarl)\b"
+	return t
+
+def t_LEA(t):
+	r"\b(leal)\b"
 	return t
 
 # Ignored characters
 t_ignore = " \t"
 
-def t_newline(t):
-	r'\n+'
-	t.lexer.lineno += t.value.count("\n")
-
 def t_error(t):
-	print("Illegal character '%s'" % t.value[0])
-	t.lexer.skip(1)
+	print("Illegal character '{}'".format(t.value[0]))
+	exit()
 
 # Build the lexer
 import ply.lex as lex
@@ -99,16 +115,31 @@ lex.lex()
 from R86 import R86
 R86Processor = R86()
 
-def p_statement_comparison_test(p):
-	"statement : COMPARE_or_TEST source COMMA source"
-	R86Processor.compare_or_test(p[1], p[2], p[4])
+def p_statement_compare(p):
+	"statement : COMPARE source COMMA source"
+	R86Processor.compare(p[1], p[2], p[4])
 
-def p_statement_jump_label(p):
+def p_statement_test(p):
+	"statement : TEST source COMMA source"
+	R86Processor.test(p[1], p[2], p[4])
+
+def p_statement_jump(p):
 	"statement : JUMP LABEL"
-	R86Processor.jump_to_label(p[1], p[2])
+	R86Processor.conditional_jump(p[1], p[2])
+
+def p_statement_conditional_jump(p):
+	"statement : CONDITIONAL_JUMP LABEL"
+	R86Processor.conditional_jump(p[1], p[2])
+
+def p_statement_jump_to_table(p):
+	"statement : JUMP ASTERISK LABEL effect_address"
 
 def p_statement_label(p):
 	"statement : LABEL COLON"
+	#do nothing
+
+def p_statement_label_in_table(p):
+	"statement : DOT_LONG LABEL"
 	#do nothing
 
 def p_statement_move(p):
@@ -192,7 +223,7 @@ def p_effect_address_num_reg_num(p):
 def p_number(p):
 	"""NUMBER : DECNUM
 			  | HEXNUM"""
-	p[0] = (int)(p[1])
+	p[0] = p[1]
 
 def p_register(p):
 	"register : PERCENTAGE REGNAME"
@@ -209,9 +240,7 @@ def p_statement_pop(p):
 	R86Processor.set(R86Processor.get("esp")+4, "esp")
 
 def p_error(p):
-	print("Syntax error at '%s'" % p.value)
-	print("Something wrong with: ")
-	print(p)
+	print("Syntax error at: {}".format(p))
 	exit()
 
 import ply.yacc as yacc
