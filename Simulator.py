@@ -28,7 +28,7 @@ class Simulator:
 import re
 
 def is_label(line):
-	line = drop_comment(drop__space_and_tab(line))
+	line = drop__space_and_tab(line)
 	matchObj = re.match(r"\.(.*):", line)
 	if matchObj:
 		return True
@@ -36,7 +36,7 @@ def is_label(line):
 		return False
 
 def get_label(line):
-	line = drop_comment(drop__space_and_tab(line))
+	line = drop__space_and_tab(line)
 	matchObj = re.match(r"\.(.*):", line)
 	return matchObj.group(1)
 
@@ -46,13 +46,6 @@ def drop__space_and_tab(line):
 		if item not in [" ", "\t"]:
 			new_line += item
 	return new_line
-
-def drop_comment(line):
-	num = line.find(";")
-	if num != -1:
-		return line[:num]
-	else:
-		return line
 
 if __name__ == "__main__":
 
