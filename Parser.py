@@ -7,6 +7,7 @@ tokens = (
 	"JUMP",
 	"UNARY_ARITH",
 	"BINARY_ARITH",
+	"SHIFT",
 	"MOVE",
 	"LEA",
 	"PUSH",
@@ -42,12 +43,16 @@ def t_REGNAME(t):
 	r"(eax|ecx|edx|ebx|esi|edi|esp|ebp)"
 	return t
 
-def t_UNARY_ARITH(t):
-	r"(incl|decl|negl|notl|sarl)"
-	return t
-
 def t_BINARY_ARITH(t):
 	r"(addl|subl|imull|xorl|orl|andl)"
+	return t
+
+def t_UNARY_ARITH(t):
+	r"(incl|decl|negl|notl)"
+	return t
+
+def t_SHIFT(t):
+	r"(sall|sarl)"
 	return t
 
 def t_MOVE(t):
@@ -106,16 +111,24 @@ def p_statement_label(p):
 	"statement : LABEL COLON"
 	#do nothing
 
-def p_satement_unary_arith(p):
-	"statement : UNARY_ARITH destination"
-	R86Processor.unary_operate(p[1], p[2])
-
 def p_statement_move(p):
 	"statement : MOVE source COMMA destination"
 	R86Processor.set(p[2], p[4])
 
+def p_satement_unary_arith(p):
+	"statement : UNARY_ARITH destination"
+	R86Processor.unary_operate(p[1], p[2])
+
 def p_statement_binary_arith(p):
 	"statement : BINARY_ARITH source COMMA destination"
+	R86Processor.binary_operate(p[1], p[2], p[4])
+
+def p_statement_unary_shift(p):
+	"statement : SHIFT destination"
+	R86Processor.unary_operate(p[1], p[2])
+
+def p_statement_binary_shift(p):
+	"statement : SHIFT source COMMA destination"
 	R86Processor.binary_operate(p[1], p[2], p[4])
 
 def p_statement_load_effect_address(p):

@@ -17,6 +17,7 @@ class R86:
 		self.unary_operation_dict["negl"] = lambda x: -x
 		self.unary_operation_dict["notl"] = lambda x: ~x
 		self.unary_operation_dict["sarl"] = lambda x: x >> 1
+		self.unary_operation_dict["sall"] = lambda x: x >> 1
 
 		self.binary_operation_dict = {}
 		self.binary_operation_dict["addl"]  = lambda x, y: x + y
