@@ -55,8 +55,9 @@ class R86:
 		target_label_line = self.code_segment[self.get_reg("eip")+1]
 		target_label = target_label_line[len(".long"):].strip()
 		label_pos = self.label_table[target_label]
+		self.set_reg(label_pos, "eip")
 
-		print("label_pos : {}".format(label_pos))
+		#print("label_pos : {}".format(label_pos))
 
 	def conditional_jump(self, ins, label):
 		should_jump = {

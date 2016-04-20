@@ -134,8 +134,6 @@ def p_statement_conditional_jump(p):
 def p_statement_jump_to_table(p):
 	"statement : JUMP ASTERISK LABEL LPAREN COMMA register COMMA NUMBER RPAREN"
 	R86Processor.jump_to_table(p[3], R86Processor.get(p[6]))
-	print("duang duang")
-	exit()
 
 def p_statement_label(p):
 	"statement : LABEL COLON"
