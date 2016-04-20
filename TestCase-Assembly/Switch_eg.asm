@@ -4,7 +4,7 @@
 	;set %ebp, %esp to 16
 	movl $7, 4(%ebp)
 	;set x
-	movl $104, 8(%ebp)
+	movl $102, 8(%ebp)
 	;set n
 
 ;switch_eg:
@@ -25,6 +25,7 @@
 
 .L5:
 	movl %edx, %eax
+	jmp .L9
 
 .L3:
 	leal (%edx, %edx, 2), %eax

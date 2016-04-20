@@ -124,11 +124,8 @@ def p_statement_test(p):
 	R86Processor.test(p[1], p[2], p[4])
 
 def p_statement_jump(p):
-	"statement : JUMP LABEL"
-	R86Processor.conditional_jump(p[1], p[2])
-
-def p_statement_conditional_jump(p):
-	"statement : CONDITIONAL_JUMP LABEL"
+	"""statement : CONDITIONAL_JUMP LABEL
+				 | JUMP             LABEL"""
 	R86Processor.conditional_jump(p[1], p[2])
 
 def p_statement_jump_to_table(p):
