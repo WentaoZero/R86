@@ -50,6 +50,14 @@ class R86:
 	def test(self, ins, second_source, first_source):
 		self.set_condition_code(first_source & second_source)
 
+	def jump_to_table(self, label, offset):
+		self.set_reg(self.label_table[label]+offset, "eip")
+		target_label_line = self.code_segment[self.get_reg("eip")+1]
+		target_label = target_label_line[len(".long"):].strip()
+		label_pos = self.label_table[target_label]
+
+		print("label_pos : {}".format(label_pos))
+
 	def conditional_jump(self, ins, label):
 		should_jump = {
 			"jmp": True,
@@ -64,7 +72,7 @@ class R86:
 		}[ins]
 
 		if should_jump:
-			self.set_reg(self.label_table[label[1:]], "eip")
+			self.set_reg(self.label_table[label], "eip")
 
 	def set_condition_code(self, result):
 		if result == 0:

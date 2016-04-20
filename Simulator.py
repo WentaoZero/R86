@@ -1,3 +1,4 @@
+import re
 from Parser import yacc
 from Parser import R86Processor
 
@@ -10,8 +11,9 @@ class Simulator:
 			for line in input_file:
 				cleaned_line = line.strip("\n\t")
 				if (0 != len(cleaned_line) and cleaned_line[0] != ";"):
-					if is_label(cleaned_line):
-						R86Processor.label_table[get_label(cleaned_line)] = len(R86Processor.code_segment)
+					label = get_label(cleaned_line)
+					if label:
+						R86Processor.label_table[label] = len(R86Processor.code_segment)
 					R86Processor.code_segment.append(cleaned_line)
 
 	def startSimulation(self):
@@ -25,27 +27,11 @@ class Simulator:
 	def printMemory(self):
 		R86Processor.printMemory()
 
-import re
-
-def is_label(line):
-	line = drop__space_and_tab(line)
-	matchObj = re.match(r"\.(.*):", line)
-	if matchObj:
-		return True
-	else:
-		return False
-
 def get_label(line):
-	line = drop__space_and_tab(line)
-	matchObj = re.match(r"\.(.*):", line)
-	return matchObj.group(1)
-
-def drop__space_and_tab(line):
-	new_line = str()
-	for item in line:
-		if item not in [" ", "\t"]:
-			new_line += item
-	return new_line
+	line = line.strip("\t ")
+	matchObj = re.match(r"(\.[a-zA-Z]+[a-zA-Z0-9]*):", line)
+	if matchObj:
+		return matchObj.group(1)
 
 if __name__ == "__main__":
 
