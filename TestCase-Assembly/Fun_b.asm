@@ -18,7 +18,7 @@
 	movl %ebx, %eax
 	andl $1, %eax
 	orl %edx, %eax
-	sarl %ebx
+	shrl %ebx
 	addl $1, %ecx
 	cmpl $32, %ecx
 	jne .L13

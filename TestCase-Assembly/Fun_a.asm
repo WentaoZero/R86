@@ -16,7 +16,7 @@
 
 .L10:
 	xorl %edx, %eax
-	sarl %edx
+	shrl %edx
 	jne .L10
 
 .L7:

@@ -94,7 +94,7 @@ def t_CONDITIONAL_JUMP(t):
 	return t
 
 def t_SHIFT(t):
-	r"\b(sall|sarl)\b"
+	r"\b(shll|shrl)\b"
 	return t
 
 def t_LEA(t):

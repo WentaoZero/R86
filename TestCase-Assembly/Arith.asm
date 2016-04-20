@@ -15,7 +15,7 @@
 
 	movl 12(%ebp), %eax
 	xorl 8(%ebp), %eax
-	sarl $3, %eax
+	shrl $3, %eax
 	notl %eax
 	subl 16(%ebp), %eax
 

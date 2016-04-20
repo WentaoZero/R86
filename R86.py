@@ -16,8 +16,8 @@ class R86:
 		self.unary_operation_dict["decl"] = lambda x: x - 1
 		self.unary_operation_dict["negl"] = lambda x: -x
 		self.unary_operation_dict["notl"] = lambda x: ~x
-		self.unary_operation_dict["sarl"] = lambda x: x >> 1
-		self.unary_operation_dict["sall"] = lambda x: x >> 1
+		self.unary_operation_dict["shrl"] = lambda x: x >> 1
+		self.unary_operation_dict["shll"] = lambda x: x >> 1
 
 		self.binary_operation_dict = {}
 		self.binary_operation_dict["addl"]  = lambda x, y: x + y
@@ -27,8 +27,8 @@ class R86:
 		self.binary_operation_dict["andl"] = lambda x, y: x & y
 		self.binary_operation_dict["xorl"] = lambda x, y: x ^ y
 
-		self.binary_operation_dict["sarl"] = lambda x, y: x >> y
-		self.binary_operation_dict["sall"] = lambda x, y: x << y
+		self.binary_operation_dict["shrl"] = lambda x, y: x >> y
+		self.binary_operation_dict["shll"] = lambda x, y: x << y
 
 		self.register_table = self.segment_register.register_table.copy()
 		self.register_table.update(self.integer_register.register_table)
