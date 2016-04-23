@@ -7,7 +7,7 @@
 	movl $9, 8(%ebp)
 	;set y
 
-;Test:
+;test:
 	pushl %ebp
 	movl %esp, %ebp
 
