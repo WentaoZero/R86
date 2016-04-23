@@ -12,7 +12,7 @@ tokens = (
 		"DECNUM"
 	) + (
 		"REGNAME",
-		"LABEL"
+		"LABEL",
 	) + (
 		"PUSH",
 		"POP",
@@ -40,12 +40,12 @@ def t_DOT_LONG(t):
 	return t
 
 def t_HEXNUM(t):
-	r"\b(-?0x[0-9a-fA-F]+)\b"
+	r"-?0x[0-9a-fA-F]+"
 	t.value = int(t.value, 16)
 	return t
 
 def t_DECNUM(t):
-	r"\b(-?[0-9]+)\b"
+	r"-?[0-9]+"
 	t.value = int(t.value, 10)
 	return t
 
