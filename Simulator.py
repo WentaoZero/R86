@@ -39,13 +39,12 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("asm",   type=str, help="Assembly file")
-	#parser.add_argument("begin", type=int, help="Memory allocated from")
-	#parser.add_argument("end",   type=int, help="Memory allocated to")
+	parser.add_argument("begin", type=int, help="Memory allocated from")
+	parser.add_argument("end",   type=int, help="Memory allocated to")
 	args = parser.parse_args()
 
 	MySim = Simulator()
-	MySim.init_memory(0, 40)
-	#MySim.init_memory(args.begin, args.end)
+	MySim.init_memory(args.begin, args.end)
 
 	MySim.readFile(args.asm)
 	MySim.startSimulation()
