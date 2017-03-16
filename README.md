@@ -1,10 +1,10 @@
-#R86
+# R86
 
 A simplified x86-like architecture simulator built to go through assembly code from chapter 3 of CS:APP 2e.
 
 Not finished yet, still working on procedure calling (`call` and `ret`).
 
-##Usage
+## Usage
 
     > python3 Simulator.py -h
     usage: Simulator.py [-h] asm begin end
@@ -14,7 +14,7 @@ Not finished yet, still working on procedure calling (`call` and `ret`).
       begin       Memory allocated from
       end         Memory allocated to
 
-##Example
+## Example
 
     > python3 Simulator.py TestCase-Assembly/fact_do.asm 0 30
     INTEGER REGISTER
@@ -50,7 +50,7 @@ Not finished yet, still working on procedure calling (`call` and `ret`).
     [4]: 0
     [0]: 0
 
-##Test case index
+## Test case index
 
 | Test case                 | in Assembly         | in Python
 |:--                        |:--                  |:--
@@ -74,13 +74,13 @@ Not finished yet, still working on procedure calling (`call` and `ret`).
 | swicher (Problem 3.29)    | swicher.asm
 
 
-##Specific
+## Specific
 
-###Integer register
+### Integer register
 
 `eax`, `ecx`, `edx`, `ebx`, `esi`, `edi`, `esp`, `ebp`
 
-###Special register
+### Special register
 `eip`: Instruction pointer
 
 `ZF`: Zero Flag. The most recent operation yielded zero.
@@ -88,7 +88,7 @@ Not finished yet, still working on procedure calling (`call` and `ret`).
 `SF`: Sign Flag. The most recent operation yielded a negative value.
 
 
-###Operand forms
+### Operand forms
 
 | Type       | Form         | Operand value        | Name
 |:-----------|:-------------|:---------------------|:-------------
@@ -106,7 +106,7 @@ Not finished yet, still working on procedure calling (`call` and `ret`).
 
 The scaling factor s must be either 1, 2, 4, or 8.
 
-###Data movement instructions
+### Data movement instructions
 | Instruction  | Effect                                | Description
 |:--           |:--                                    |:--
 | movl S,D     | D←S                                   | Move double word
@@ -114,7 +114,7 @@ The scaling factor s must be either 1, 2, 4, or 8.
 | popl D       | D ← M[R[%esp]]; R[%esp] ← R[%esp]+4   | Pop double word
                 
 
-###Integer arithmetic operations
+### Integer arithmetic operations
 | Instruction  | Effect     | Description
 |:--           |:--         |:--
 | leal S,D     | D ← &S     | Load effective address
@@ -129,14 +129,14 @@ The scaling factor s must be either 1, 2, 4, or 8.
 | shl k,D      | D ← D << k | Left shift
 | shr k,D      | D ← D >>L k| Logical right shift
 
-###Comparison and test instructions
+### Comparison and test instructions
 
 | Instruction | Based on  | Description
 |:--          |:--        |:--
 | cmpl S2, S1 | S1 - S2   | Compare double word
 | testl S2, S1| S1 & S2   | Test double word
 
-###The jump instructions
+### The jump instructions
 
 | Instruction | Jump  condition | Description
 |:--          |:--              |:--
